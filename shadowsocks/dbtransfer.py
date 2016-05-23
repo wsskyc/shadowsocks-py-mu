@@ -50,7 +50,7 @@ class DbTransfer(object):
             if data == 'e':
                 break
             data = json.loads(data)
-            print data
+            #print data
             dt_transfer.update(data)
         cli.close()
         return dt_transfer
@@ -76,7 +76,7 @@ class DbTransfer(object):
                     ' END, d = CASE port' + query_sub_when2 + \
                     ' END, t = ' + str(int(last_time)) + \
                     ' WHERE port IN (%s)' % query_sub_in
-        # print query_sql
+        #print query_sql
         conn = cymysql.connect(host=config.MYSQL_HOST, port=config.MYSQL_PORT, user=config.MYSQL_USER,
                                passwd=config.MYSQL_PASS, db=config.MYSQL_DB, charset='utf8')
         cur = conn.cursor()
@@ -119,7 +119,7 @@ class DbTransfer(object):
                 if row[5] == 1 and row[6] == 1 and row[1] + row[2] < row[3]:
                     logging.info('db start server at port [%s] pass [%s]' % (row[0], row[4]))
                     DbTransfer.send_command('add: {"server_port": %s, "password":"%s"}'% (row[0], row[4]))
-                    print('add: {"server_port": %s, "password":"%s"}'% (row[0], row[4]))
+                    #print('add: {"server_port": %s, "password":"%s"}'% (row[0], row[4]))
 
     @staticmethod
     def thread_db():
@@ -143,3 +143,4 @@ class DbTransfer(object):
 
 #SQLData.pull_db_all_user()
 #print DbTransfer.send_command("")
+
