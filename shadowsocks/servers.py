@@ -24,7 +24,8 @@ import signal
 import time
 
 if config.LOG_ENABLE:
-    logging.basicConfig(format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',datefmt='%Y, %b %d %a %H:%M:%S',filename=config.LOG_FILE,level=config.LOG_LEVEL)
+    logging.basicConfig(format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                        datefmt='%Y, %b %d %a %H:%M:%S', filename=config.LOG_FILE, level=config.LOG_LEVEL)
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../'))
 from shadowsocks import shell, daemon, eventloop, tcprelay, udprelay, \
@@ -34,8 +35,10 @@ import manager
 import config
 from dbtransfer import DbTransfer
 
+
 def handler_SIGQUIT():
     return
+
 
 def main():
     configer = {
@@ -45,10 +48,10 @@ def main():
         },
         'method': '%s' % config.SS_METHOD,
         'manager_address': '%s:%s' % (config.MANAGE_BIND_IP, config.MANAGE_PORT),
-        'timeout': 185, # some protocol keepalive packet 3 min Eg bt
+        'timeout': 185,  # some protocol keepalive packet 3 min Eg bt
         'fast_open': False,
         'verbose': 1,
-        'one_time_auth':'%s' % config.SS_OTA
+        'one_time_auth': '%s' % config.SS_OTA
     }
     t = thread.start_new_thread(manager.run, (configer,))
     time.sleep(1)

@@ -151,6 +151,7 @@ class SelectLoop(object):
 
 
 class UvEventLoop(object):
+
     def __init__(self):
         self._periodic_callbacks = []
         self.loop = pyuv.Loop.default_loop()
@@ -159,7 +160,7 @@ class UvEventLoop(object):
         self._fd2sock = {}
 
     def _update(self, f, mode, handler=None):
-        
+
         def uvcallback(watcher, revents, error):
             event = 0
             if error:
@@ -175,7 +176,7 @@ class UvEventLoop(object):
                 handler.handle_event(self._fd2sock[fd], fd, event)
             except (OSError, IOError) as e:
                 shell.print_exception(e)
-        
+
         fd = f.fileno()
         uvmode = 0
         if mode & POLL_IN:
@@ -216,12 +217,12 @@ class UvEventLoop(object):
         self.loop.stop()
 
     def run(self):
-        
+
         def _periodic(timer):
             for callback in self._periodic_callbacks:
                 callback()
             timer.start(_periodic, TIMEOUT_PRECISION, 0)
-        
+
         timer = pyuv.Timer(self.loop)
         timer.start(_periodic, TIMEOUT_PRECISION, 0)
         self.loop.run()
@@ -231,6 +232,7 @@ class UvEventLoop(object):
 
 
 class PyEventLoop(object):
+
     def __init__(self):
         if hasattr(select, 'epoll'):
             self._impl = select.epoll()
@@ -321,7 +323,8 @@ if sys.platform == "win32":
         EventLoop = UvEventLoop
         logging.warn('using EventLoop as UvEventLoop')
     except:
-        logging.warn('using EventLoop as PyEventLoop. try install pyuv https://pypi.python.org/pypi/pyuv')
+        logging.warn(
+            'using EventLoop as PyEventLoop. try install pyuv https://pypi.python.org/pypi/pyuv')
 
 
 # from tornado

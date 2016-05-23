@@ -109,7 +109,8 @@ class Manager(object):
         port = int(config['server_port'])
         servers = self._relays.get(port, None)
         if servers:
-            self._send_control_data(b'{"stat":"ok", "password":"%s"}' % servers[0]._config['password'])
+            self._send_control_data(b'{"stat":"ok", "password":"%s"}' % servers[
+                                    0]._config['password'])
         else:
             self._send_control_data(b'{"stat":"ko"}')
 
@@ -196,7 +197,7 @@ class Manager(object):
                                     errno.EWOULDBLOCK, errno.WSAEWOULDBLOCK):
                         return
                 elif error_no in (errno.EAGAIN, errno.EINPROGRESS,
-                                errno.EWOULDBLOCK):
+                                  errno.EWOULDBLOCK):
                     return
                 else:
                     shell.print_exception(e)

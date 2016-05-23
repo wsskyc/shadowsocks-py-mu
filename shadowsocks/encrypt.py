@@ -69,6 +69,7 @@ def EVP_BytesToKey(password, key_len, iv_len):
 
 
 class Encryptor(object):
+
     def __init__(self, password, method):
         self.password = password
         self.key = None
