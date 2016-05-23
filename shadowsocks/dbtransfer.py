@@ -4,7 +4,6 @@
 import logging
 import cymysql
 import time
-import sys
 import socket
 import config
 import json
@@ -29,8 +28,7 @@ class DbTransfer(object):
         try:
             cli = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             cli.settimeout(1)
-            cli.sendto(
-                cmd, ('%s' % (config.MANAGE_BIND_IP), config.MANAGE_PORT))
+            cli.sendto(cmd, ('%s' % config.MANAGE_BIND_IP, config.MANAGE_PORT))
             data, addr = cli.recvfrom(1500)
             cli.close()
             # TODO: bad way solve timed out
@@ -44,9 +42,7 @@ class DbTransfer(object):
         dt_transfer = {}
         cli = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         cli.settimeout(2)
-        cli.sendto('transfer: {}', ('%s' %
-                                    (config.MANAGE_BIND_IP), config.MANAGE_PORT))
-        bflag = False
+        cli.sendto('transfer: {}', (config.MANAGE_BIND_IP, config.MANAGE_PORT))
         while True:
             data, addr = cli.recvfrom(1500)
             if data == 'e':
@@ -85,6 +81,8 @@ class DbTransfer(object):
         cur.close()
         conn.commit()
         conn.close()
+        if config.SS_VERBOSE:
+            logging.info('db upload')
 
     @staticmethod
     def del_server_out_of_bound_safe(rows):
@@ -93,63 +91,74 @@ class DbTransfer(object):
                 'stat: {"server_port":%s}' % row[0]))
             if server['stat'] != 'ko':
                 if row[5] == 0 or row[6] == 0:
-                    # stop disable or switch off user
+                    # stop disabled or switched-off user
                     logging.info(
-                        'db stop server at port [%s] reason: disable' % (row[0]))
+                        'db stop server at port [%s] reason: disable' % row[0])
                     DbTransfer.send_command(
                         'remove: {"server_port":%s}' % row[0])
                 elif row[1] + row[2] >= row[3]:
-                    # stop out bandwidth user
+                    # stop user that exceeds bandwidth limit
                     logging.info(
-                        'db stop server at port [%s] reason: out bandwidth' % (row[0]))
+                        'db stop server at port [%s] reason: out bandwidth' % row[0])
                     DbTransfer.send_command(
                         'remove: {"server_port":%s}' % row[0])
-                if server['password'] != row[4]:
+                elif server['password'] != row[4]:
                     # password changed
                     logging.info(
-                        'db stop server at port [%s] reason: password changed' % (row[0]))
+                        'db stop server at port [%s] reason: password changed' % row[0])
+                    DbTransfer.send_command(
+                        'remove: {"server_port":%s}' % row[0])
+                elif server['method'] != row[7]:
+                    # encryption method changed
+                    logging.info(
+                        'db stop server at port [%s] reason: encryption method changed' % row[0])
                     DbTransfer.send_command(
                         'remove: {"server_port":%s}' % row[0])
             else:
                 if row[5] == 1 and row[6] == 1 and row[1] + row[2] < row[3]:
-                    logging.info(
-                        'db start server at port [%s] pass [%s]' % (row[0], row[4]))
+                    if config.MANAGE_BIND_IP != '127.0.0.1':
+                        logging.info(
+                            'db start server at port [%s] with password [%s] and method [%s]' % (row[0], row[4], row[7]))
                     DbTransfer.send_command(
-                        'add: {"server_port": %s, "password":"%s"}' % (row[0], row[4]))
-                    #print('add: {"server_port": %s, "password":"%s"}'% (row[0], row[4]))
+                        'add: {"server_port": %s, "password":"%s", "method":"%s", "email":"%s"}' % (row[0], row[4], row[7], row[8]))
 
     @staticmethod
     def thread_db():
-        import socket
-        import time
-        timeout = 30
-        socket.setdefaulttimeout(timeout)
+        socket.setdefaulttimeout(config.MYSQL_TIMEOUT)
         while True:
-            logging.warn('db loop')
             try:
                 DbTransfer.get_instance().push_db_all_user()
                 rows = DbTransfer.pull_db_all_user()
                 DbTransfer.del_server_out_of_bound_safe(rows)
             except Exception as e:
                 import traceback
-                traceback.print_exc()
-                logging.warn('db thread except:%s' % e)
+                if config.SS_VERBOSE:
+                    traceback.print_exc()
+                logging.error('db thread except:%s' % e)
             finally:
                 time.sleep(15)
 
-
-def pull_db_all_user():
-    conn = cymysql.connect(host=config.MYSQL_HOST, port=config.MYSQL_PORT, user=config.MYSQL_USER,
-                           passwd=config.MYSQL_PASS, db=config.MYSQL_DB, charset='utf8')
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT port, u, d, transfer_enable, passwd, switch, enable FROM user")
-    rows = []
-    for r in cur.fetchall():
-        rows.append(list(r))
-    cur.close()
-    conn.close()
-    return rows
-
-# SQLData.pull_db_all_user()
-# print DbTransfer.send_command("")
+    @staticmethod
+    def pull_db_all_user():
+        string = ''
+        for index in range(len(config.SS_SKIP_PORTS)):
+            port = config.SS_SKIP_PORTS[index]
+            logging.info('db skipped port %s' % port)
+            if index == 0:
+                string = ' WHERE `port`<>%s' % port
+            else:
+                string = '%s AND `port`<>%s' % (string, port)
+        conn = cymysql.connect(host=config.MYSQL_HOST, port=config.MYSQL_PORT, user=config.MYSQL_USER,
+                               passwd=config.MYSQL_PASS, db=config.MYSQL_DB, charset='utf8')
+        cur = conn.cursor()
+        cur.execute('SELECT port, u, d, transfer_enable, passwd, switch, enable, method, email FROM %s%s ORDER BY `port` ASC'
+                    % (config.MYSQL_USER_TABLE, string))
+        rows = []
+        for r in cur.fetchall():
+            rows.append(list(r))
+        # Release resources
+        cur.close()
+        conn.close()
+        if config.SS_VERBOSE:
+            logging.info('db downloaded')
+        return rows

@@ -12,6 +12,7 @@ CREATE TABLE `user` (
   `port` int(11) NOT NULL,
   `switch` tinyint(4) NOT NULL DEFAULT '1',
   `enable` tinyint(4) NOT NULL DEFAULT '1',
+  `method` varchar(20) NOT NULL DEFAULT 'aes-256-cfb',
   `type` tinyint(4) NOT NULL DEFAULT '1',
   `last_get_gift_time` int(11) NOT NULL DEFAULT '0',
   `last_rest_pass_time` int(11) NOT NULL DEFAULT '0',
@@ -21,4 +22,4 @@ CREATE TABLE `user` (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES ('0', 'test@test.com', '123456', '0000000', '1410609560', '0', '0', '9320666234', '50000', '1', '1', '7', '0', '0');
+INSERT INTO `user` VALUES ('0', 'test@test.com', '123456', '0000000', '1410609560', '0', '0', '9320666234', '50000', '1', '1', 'aes-256-cfb', '7', '0', '0');

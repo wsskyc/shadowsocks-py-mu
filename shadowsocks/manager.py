@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright 2015 clowwindy
+# Copyright 2016 Howard Liu
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -24,6 +25,7 @@ import socket
 import logging
 import json
 import collections
+import sys
 
 from shadowsocks import common, eventloop, tcprelay, udprelay, asyncdns, shell
 
@@ -80,10 +82,11 @@ class Manager(object):
         port = int(config['server_port'])
         servers = self._relays.get(port, None)
         if servers:
-            logging.error("server already exists at %s:%d" % (config['server'],
-                                                              port))
+            logging.error("Server Exists:  P[%d], M[%s], E[%s]" % (
+                port, config['method'], config['email']))
             return
-        logging.info("adding server at %s:%d" % (config['server'], port))
+        logging.info("Server Added:   P[%d], M[%s], E[%s]" %
+                     (port, config['method'], config['email']))
         t = tcprelay.TCPRelay(config, self._dns_resolver, False,
                               self.stat_callback)
         u = udprelay.UDPRelay(config, self._dns_resolver, False,
@@ -96,22 +99,24 @@ class Manager(object):
         port = int(config['server_port'])
         servers = self._relays.get(port, None)
         if servers:
-            logging.info("removing server at %s:%d" % (config['server'], port))
+            logging.info("Server Removed: P[%d]" % port)
             t, u = servers
             t.close(next_tick=False)
             u.close(next_tick=False)
             del self._relays[port]
         else:
-            logging.error("server not exist at %s:%d" % (config['server'],
-                                                         port))
+            logging.error("Svr Not Exists: P[%d], M[%s], E[%s]" % (
+                port, config['method'], config['email']))
 
     def stat_port(self, config):
         port = int(config['server_port'])
         servers = self._relays.get(port, None)
         if servers:
-            self._send_control_data(b'{"stat":"ok", "password":"%s"}' % servers[
-                                    0]._config['password'])
+            # Server is now running
+            self._send_control_data(b'{"stat":"ok", "password":"%s", "method":"%s"}' % (
+                servers[0]._config['password'], servers[0]._config['method']))
         else:
+            # Server is not running
             self._send_control_data(b'{"stat":"ko"}')
 
     def handle_event(self, sock, fd, event):

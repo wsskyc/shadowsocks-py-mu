@@ -29,3 +29,5 @@ htmlcov
 
 .DS_Store
 .idea
+shadowsocks/config.py
+*.log

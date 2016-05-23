@@ -109,8 +109,8 @@ class TCPRelayHandler(object):
         # if is_local, this is sslocal
         self._is_local = is_local
         self._stage = STAGE_INIT
-        self._encryptor = encrypt.Encryptor(config['password'],
-                                            config['method'])
+        self._encryptor = encrypt.Encryptor(
+            config['password'], config['method'])
         if 'one_time_auth' in config and config['one_time_auth']:
             self._ota_enable = True
         else:
@@ -135,8 +135,8 @@ class TCPRelayHandler(object):
         fd_to_handlers[local_sock.fileno()] = self
         local_sock.setblocking(False)
         local_sock.setsockopt(socket.SOL_TCP, socket.TCP_NODELAY, 1)
-        loop.add(local_sock, eventloop.POLL_IN | eventloop.POLL_ERR,
-                 self._server)
+        loop.add(local_sock, eventloop.POLL_IN |
+                 eventloop.POLL_ERR, self._server)
         self.last_activity = 0
         self._update_activity()
 
