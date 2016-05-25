@@ -28,8 +28,12 @@ SS_METHOD = 'aes-256-cfb'
 SS_OTA = 'true'
 # Skip listening these ports
 SS_SKIP_PORTS = ['443']
+# Ban these outbound ports
+SS_BAN_PORTS = [
+    '22', '23', '25', '109', '110', '143', '465', '587', '995', '993'
+]
 # Shadowsocks Time Out
-# It should > 180s as some protocol keepalive packet 3 min, Eg.: bt
+# It should > 180s as some protocol has keep-alive packet of 3 min, Eg.: bt
 SS_TIMEOUT = 185
 # Shadowsocks TCP Fastopen (Some OS may not support this)
 SS_FASTOPEN = False
@@ -39,9 +43,9 @@ SS_VERBOSE = 1
 SS_FORBIDDEN_IP = []
 
 # LOG CONFIG
-LOG_ENABLE = False
+LOG_ENABLE = True
 # Available Log Level: logging.NOTSET|DEBUG|INFO|WARNING|ERROR|CRITICAL
-LOG_LEVEL = logging.DEBUG
+LOG_LEVEL = logging.INFO
 LOG_FILE = 'shadowsocks.log'
 # The following format is the one suggested for debugging
 # LOG_FORMAT = '%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s'

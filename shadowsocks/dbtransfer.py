@@ -1,5 +1,20 @@
 #!/usr/bin/python
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
+#
+# Copyright 2015 mengskysama
+# Copyright 2016 Howard Liu
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
 
 import logging
 import cymysql
@@ -93,34 +108,34 @@ class DbTransfer(object):
                 if row[5] == 0 or row[6] == 0:
                     # stop disabled or switched-off user
                     logging.info(
-                        'db stop server at port [%s] reason: disable' % row[0])
+                        'db stop server at port [%d] reason: disable' % row[0])
                     DbTransfer.send_command(
-                        'remove: {"server_port":%s}' % row[0])
+                        'remove: {"server_port":%d}' % row[0])
                 elif row[1] + row[2] >= row[3]:
                     # stop user that exceeds bandwidth limit
                     logging.info(
-                        'db stop server at port [%s] reason: out bandwidth' % row[0])
+                        'db stop server at port [%d] reason: out bandwidth' % row[0])
                     DbTransfer.send_command(
-                        'remove: {"server_port":%s}' % row[0])
+                        'remove: {"server_port":%d}' % row[0])
                 elif server['password'] != row[4]:
                     # password changed
                     logging.info(
-                        'db stop server at port [%s] reason: password changed' % row[0])
+                        'db stop server at port [%d] reason: password changed' % row[0])
                     DbTransfer.send_command(
-                        'remove: {"server_port":%s}' % row[0])
+                        'remove: {"server_port":%d}' % row[0])
                 elif server['method'] != row[7]:
                     # encryption method changed
                     logging.info(
-                        'db stop server at port [%s] reason: encryption method changed' % row[0])
+                        'db stop server at port [%d] reason: encryption method changed' % row[0])
                     DbTransfer.send_command(
-                        'remove: {"server_port":%s}' % row[0])
+                        'remove: {"server_port":%d}' % row[0])
             else:
                 if row[5] == 1 and row[6] == 1 and row[1] + row[2] < row[3]:
                     if config.MANAGE_BIND_IP != '127.0.0.1':
                         logging.info(
                             'db start server at port [%s] with password [%s] and method [%s]' % (row[0], row[4], row[7]))
                     DbTransfer.send_command(
-                        'add: {"server_port": %s, "password":"%s", "method":"%s", "email":"%s"}' % (row[0], row[4], row[7], row[8]))
+                        'add: {"server_port": %d, "password":"%s", "method":"%s", "email":"%s"}' % (row[0], row[4], row[7], row[8]))
 
     @staticmethod
     def thread_db():

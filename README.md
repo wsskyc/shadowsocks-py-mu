@@ -1,66 +1,65 @@
-About manyuser
-----------------
+About shadowsocks-python manyuser
+=================================
+This is a multi-user version of shadowsocks-python. Requires a mysql database.
 
 Install
 -------
+1. install MySQL 5.x.x
+2. install cymysql library by `pip install cymysql`
+3. create a database named `shadowsocks`
+4. import `shadowsocks.sql` into `shadowsocks`
+5. copy `config.example.py` to `config.py` and edit it following the notes inside
+6. TestRun `cd shadowsocks && python servers.py` (not server.py)
 
-install MySQL 5.x.x
+if no exception the server will startup. By default logging is enabled.
+You should be able to see this kind of thing in `shadowsocks.log`(default log file name)
+```
+May 25 23:03:16 INFO Multi-User Shadowsocks Server Starting...
+May 25 23:03:17 INFO Current Server Version: 2.8.3-83-gf8dd2f8
 
-`pip install cymysql`
+May 25 23:03:18 INFO db skipped port 443
+May 25 23:03:19 INFO db downloaded
+May 25 23:03:19 INFO Server Added:   P[XXXX], M[aes-256-cfb], E[XXX@XXX.XXX]
+```
 
-create a database named `shadowsocks`
+Explanation of the log output
+-----------------------------
+When adding server:
 
-import `shadowsocks.sql` into `shadowsocks`
+`P[XXX]` client port (assigned by database)
 
-if you upgrade from old version make sure:
+`M[XXX]` client encryption method
 
-  `pass` is varchar(32) NOT NULL,
-  `passwd` is varchar(32) NOT NULL,
-  `last_get_gift_time` not `last_get_gitf_time`
+`E[XXX]` client email address
 
+When data connection being established/blocked
 
-edit config.py
+`U[XXX]` client port (assigned by database)
 
-Example:
+`RP[XXX]` remote port (the port the client wants to connect)
 
-    #Config
-    MYSQL_HOST = 'mengsky.net'
-    MYSQL_PORT = 3306
-    MYSQL_USER = 'root'
-    MYSQL_PASS = 'root'
-    MYSQL_DB = 'shadowsocks'
-
-    MANAGE_PASS = 'passwd'
-    #if you want manage in other server you should set this value to global ip
-    MANAGE_BIND_IP = '127.0.0.1'
-    #make sure this port is idle
-    MANAGE_PORT = 23333
-    #BIND IP
-    #if you want bind ipv4 and ipv6 '[::]'
-    #if you want bind all of ipv4 if '0.0.0.0'
-    #if you want bind all of if only '4.4.4.4'
-    SS_BIND_IP = '0.0.0.0'
-
-
-TestRun `cd shadowsocks` ` python servers.py` not server.py
-
-if no exception server will startup. you will see such like
-Example:
-
-    add: {"server_port": XXXXX, "password":"XXXXX"}
-
+`A[XXX-->XXX]` from the client address to the remote address
 
 Database user table column
-------------------
+--------------------------
 `passwd` server pass
 
 `port` server port
 
-`t` last keepalive time
+`t` last connecting time
 
 `u` upload transfer
 
-`d` download transfer (upload & download in here now)
+`d` download transfer
 
-`transfer_enable` if u + d > transfer_enable this server will be stop (db_transfer.py del_server_out_of_bound_safe)
+`method` encryption method
 
+`transfer_enable` if u + d > transfer_enable this server will be stop (method del_server_out_of_bound_safe in dbtransfer.py)
+
+Compatibility with other frontend UIs
+-------------------------------------
+It is compatible with [ss-panel](https://github.com/orvice/ss-panel).
+
+Open source license
+-------------------
+This program is licensed under [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)

@@ -180,6 +180,17 @@ class UDPRelay(object):
             return
         addrtype, dest_addr, dest_port, header_length = header_result
 
+        if dest_port in self._config['banned_ports']:
+            logging.warning('UDP PORT BANNED: U[%d] RP[%d] A[%s-->%s]' % (
+                self._config['port'], dest_port,
+                self._listen_port, common.to_str(dest_addr)
+            ))
+            return
+        else:
+            logging.info('UDP CONN: U[%d] RP[%d] A[%s-->%s]' % (
+                self._config['port'], dest_port,
+                self._listen_port, common.to_str(dest_addr)
+            ))
         if self._is_local:
             server_addr, server_port = self._get_a_server()
         else:

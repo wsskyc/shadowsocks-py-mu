@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright 2015 clowwindy
+# Copyright 2016 Howard Liu
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -315,9 +316,17 @@ class TCPRelayHandler(object):
             if header_result is None:
                 raise Exception('can not parse header')
             addrtype, remote_addr, remote_port, header_length = header_result
-            logging.info('connecting %s:%d from %s:%d' %
-                         (common.to_str(remote_addr), remote_port,
-                          self._client_address[0], self._client_address[1]))
+            if remote_port in self._config['banned_ports']:
+                logging.warning('TCP PORT BANNED: U[%d] RP[%d] A[%s-->%s]' % (
+                    self._config['port'], remote_port,
+                    self._client_address[0], common.to_str(remote_addr)
+                ))
+                return
+            else:
+                logging.info('TCP CONN: U[%d] RP[%d] A[%s-->%s]' % (
+                    self._config['port'], remote_port,
+                    self._client_address[0], common.to_str(remote_addr)
+                ))
             if self._is_local is False:
                 # spec https://shadowsocks.org/en/spec/one-time-auth.html
                 if self._ota_enable or addrtype & ADDRTYPE_AUTH:

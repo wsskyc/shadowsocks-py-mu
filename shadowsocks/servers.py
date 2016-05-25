@@ -22,6 +22,7 @@ import logging
 import thread
 import config
 import time
+import subprocess
 
 if config.LOG_ENABLE:
     logging.basicConfig(format=config.LOG_FORMAT,
@@ -47,8 +48,11 @@ def main():
         'fast_open': config.SS_FASTOPEN,
         'verbose': config.SS_VERBOSE,
         'one_time_auth': config.SS_OTA,
-        'forbidden_ip': config.SS_FORBIDDEN_IP
+        'forbidden_ip': config.SS_FORBIDDEN_IP,
+        'banned_ports': config.SS_BAN_PORTS
     }
+    logging.info('\nMulti-User Shadowsocks Server Starting...')
+    logging.info('Current Server Version: %s' % subprocess.check_output(["git", "describe"]))
     thread.start_new_thread(manager.run, (configer,))
     time.sleep(1)
     thread.start_new_thread(DbTransfer.thread_db, ())

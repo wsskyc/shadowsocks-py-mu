@@ -1,4 +1,5 @@
 import codecs
+import subprocess
 from setuptools import setup
 
 
@@ -7,7 +8,7 @@ with codecs.open('README.rst', encoding='utf-8') as f:
 
 setup(
     name="shadowsocks",
-    version="2.8.2",
+    version=subprocess.check_output(["git", "describe"]),
     license='http://www.apache.org/licenses/LICENSE-2.0',
     description="A fast tunnel proxy that help you get through firewalls",
     author='clowwindy',
