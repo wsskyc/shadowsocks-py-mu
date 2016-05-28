@@ -25,12 +25,12 @@ SS_BIND_IP = '::'
 # This default method will be replaced by database record if applicable
 SS_METHOD = 'aes-256-cfb'
 # Shadowsocks One Time Auth (OTA)
-SS_OTA = 'true'
+SS_OTA = False
 # Skip listening these ports
 SS_SKIP_PORTS = ['443']
 # Ban these outbound ports
 SS_BAN_PORTS = [
-    '22', '23', '25', '109', '110', '143', '465', '587', '995', '993'
+    '22', '23', '25'
 ]
 # Shadowsocks Time Out
 # It should > 180s as some protocol has keep-alive packet of 3 min, Eg.: bt

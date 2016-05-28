@@ -318,13 +318,13 @@ class TCPRelayHandler(object):
             addrtype, remote_addr, remote_port, header_length = header_result
             if remote_port in self._config['banned_ports']:
                 logging.warning('TCP PORT BANNED: U[%d] RP[%d] A[%s-->%s]' % (
-                    self._config['port'], remote_port,
+                    self._config['server_port'], remote_port,
                     self._client_address[0], common.to_str(remote_addr)
                 ))
                 return
             else:
                 logging.info('TCP CONN: U[%d] RP[%d] A[%s-->%s]' % (
-                    self._config['port'], remote_port,
+                    self._config['server_port'], remote_port,
                     self._client_address[0], common.to_str(remote_addr)
                 ))
             if self._is_local is False:
