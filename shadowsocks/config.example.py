@@ -17,6 +17,13 @@ MANAGE_BIND_IP = '127.0.0.1'
 # make sure this port is idle
 MANAGE_PORT = 23333
 
+PANEL_VERSION = 'V2' # V2 or V3. V2 not support API
+API_URL = 'http://www.snode.club/mu'
+API_PASS = 'EtVWzUBz'
+NODE_ID = '1'
+CHECKTIME = 15
+SYNCTIME = 600
+
 # BIND IP
 # if you want bind ipv4 and ipv6 '::'
 # if you want bind all of ipv4 if '0.0.0.0'
