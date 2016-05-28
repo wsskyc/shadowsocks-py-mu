@@ -189,7 +189,6 @@ class DbTransfer(object):
         socket.setdefaulttimeout(config.MYSQL_TIMEOUT)
         while True:
             try:
-                DbTransfer.get_instance().push_db_all_user()
                 rows = DbTransfer.pull_db_all_user()
                 DbTransfer.del_server_out_of_bound_safe(rows)
             except Exception as e:
@@ -198,7 +197,24 @@ class DbTransfer(object):
                     traceback.print_exc()
                 logging.error('db thread except:%s' % e)
             finally:
-                time.sleep(15)
+                time.sleep(config.CHECKTIME)
+
+    @staticmethod
+    def thread_push():
+        import socket
+        import time
+        timeout = 30
+        socket.setdefaulttimeout(timeout)
+        while True:
+            logging.info('db loop2')
+            try:
+                DbTransfer.get_instance().push_db_all_user()
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                logging.warn('db thread except:%s' % e)
+            finally:
+                time.sleep(config.SYNCTIME)
 
     @staticmethod
     def pull_db_all_user():
