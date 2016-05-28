@@ -18,8 +18,8 @@ MANAGE_BIND_IP = '127.0.0.1'
 MANAGE_PORT = 23333
 
 PANEL_VERSION = 'V2' # V2 or V3. V2 not support API
-API_URL = 'http://www.snode.club/mu'
-API_PASS = 'EtVWzUBz'
+API_URL = 'http://domain/mu'
+API_PASS = 'mupass'
 NODE_ID = '1'
 CHECKTIME = 15
 SYNCTIME = 600
