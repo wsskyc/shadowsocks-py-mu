@@ -69,6 +69,8 @@ class DbTransfer(object):
         return dt_transfer
 
     def push_db_all_user(self):
+        import urllib2, urllib
+        import time
         dt_transfer = self.get_servers_transfer()
 
         if config.PANEL_VERSION == 'V2':
@@ -201,17 +203,14 @@ class DbTransfer(object):
 
     @staticmethod
     def thread_push():
-        import socket
-        import time
-        timeout = 30
-        socket.setdefaulttimeout(timeout)
+        socket.setdefaulttimeout(config.MYSQL_TIMEOUT)
         while True:
-            logging.info('db loop2')
             try:
                 DbTransfer.get_instance().push_db_all_user()
             except Exception as e:
                 import traceback
-                traceback.print_exc()
+                if config.SS_VERBOSE:
+                    traceback.print_exc()
                 logging.warn('db thread except:%s' % e)
             finally:
                 time.sleep(config.SYNCTIME)

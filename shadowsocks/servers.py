@@ -57,7 +57,7 @@ def main():
     time.sleep(1)
     thread.start_new_thread(DbTransfer.thread_db, ())
     time.sleep(1)
-    t = thread.start_new_thread(DbTransfer.thread_push, ())
+    thread.start_new_thread(DbTransfer.thread_push, ())
     
     while True:
         time.sleep(100)
