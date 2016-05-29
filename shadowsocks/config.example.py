@@ -23,6 +23,7 @@ API_PASS = 'mupass'
 NODE_ID = '1'
 CHECKTIME = 15
 SYNCTIME = 600
+CUSTOM_METHOD = True
 
 # BIND IP
 # if you want bind ipv4 and ipv6 '::'
