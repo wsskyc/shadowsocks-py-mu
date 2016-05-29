@@ -172,17 +172,22 @@ class DbTransfer(object):
                         'db stop server at port [%d] reason: password changed' % row[0])
                     DbTransfer.send_command(
                         'remove: {"server_port":%d}' % row[0])
-                elif server['method'] != row[7]:
-                    # encryption method changed
-                    logging.info(
-                        'db stop server at port [%d] reason: encryption method changed' % row[0])
-                    DbTransfer.send_command(
-                        'remove: {"server_port":%d}' % row[0])
+                else :
+                    if not config.CUSTOM_METHOD:
+                        row[7] = config.SS_METHOD
+                    if server['method'] != row[7] :
+                        # encryption method changed
+                        logging.info(
+                            'db stop server at port [%d] reason: encryption method changed' % row[0])
+                        DbTransfer.send_command(
+                            'remove: {"server_port":%d}' % row[0])
             else:
                 if row[5] == 1 and row[6] == 1 and row[1] + row[2] < row[3]:
                     if config.MANAGE_BIND_IP != '127.0.0.1':
                         logging.info(
                             'db start server at port [%s] with password [%s] and method [%s]' % (row[0], row[4], row[7]))
+                    if not config.CUSTOM_METHOD:
+                        row[7] = config.SS_METHOD
                     DbTransfer.send_command(
                         'add: {"server_port": %d, "password":"%s", "method":"%s", "email":"%s"}' % (row[0], row[4], row[7], row[8]))
 
