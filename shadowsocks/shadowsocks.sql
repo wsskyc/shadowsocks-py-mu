@@ -17,9 +17,9 @@ CREATE TABLE `user` (
   `last_get_gift_time` int(11) NOT NULL DEFAULT '0',
   `last_rest_pass_time` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`,`port`)
-) ENGINE=InnoDB AUTO_INCREMENT=415 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=50000 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES ('0', 'test@test.com', '123456', '0000000', '1410609560', '0', '0', '9320666234', '50000', '1', '1', 'aes-256-cfb', '7', '0', '0');
+INSERT INTO `user` VALUES ('50000', 'test@test.com', '123456', '0000000', '1410609560', '0', '0', '9320666234', '50000', '1', '1', 'aes-256-cfb', '7', '0', '0');
