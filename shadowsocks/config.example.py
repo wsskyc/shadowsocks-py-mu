@@ -1,4 +1,4 @@
-# Please edit this file and rename it as config.py
+# Please rename this file as config.py before editing it
 
 import logging
 
@@ -17,12 +17,17 @@ MANAGE_BIND_IP = '127.0.0.1'
 # make sure this port is idle
 MANAGE_PORT = 23333
 
-PANEL_VERSION = 'V2' # V2 or V3. V2 not support API
+# SS Panel API Setting
+# Version of Panel: V2 or V3. V2 not support API thus no need to change
+# anything in the following settings
+PANEL_VERSION = 'V2'
 API_URL = 'http://domain/mu'
 API_PASS = 'mupass'
 NODE_ID = '1'
 CHECKTIME = 15
 SYNCTIME = 600
+
+# Choose True if you want to use custom method
 CUSTOM_METHOD = True
 
 # BIND IP
@@ -35,18 +40,18 @@ SS_METHOD = 'aes-256-cfb'
 # Shadowsocks One Time Auth (OTA)
 SS_OTA = False
 # Skip listening these ports
-SS_SKIP_PORTS = ['443']
+SS_SKIP_PORTS = ['80']
 # Ban these outbound ports
-SS_BAN_PORTS = [
-    '22', '23', '25'
-]
+# Members should be INTEGERS
+SS_BAN_PORTS = [22, 23, 25]
+
 # Shadowsocks Time Out
 # It should > 180s as some protocol has keep-alive packet of 3 min, Eg.: bt
 SS_TIMEOUT = 185
 # Shadowsocks TCP Fastopen (Some OS may not support this)
 SS_FASTOPEN = False
 # Shadowsocks verbose
-SS_VERBOSE = 1
+SS_VERBOSE = False
 # Banned IP List
 SS_FORBIDDEN_IP = []
 
