@@ -51,7 +51,8 @@ def main():
         'forbidden_ip': config.SS_FORBIDDEN_IP,
         'banned_ports': config.SS_BAN_PORTS
     }
-    logging.info('\nMulti-User Shadowsocks Server Starting...')
+    logging.info('-----------------------------------------')
+    logging.info('Multi-User Shadowsocks Server Starting...')
     logging.info('Current Server Version: %s' % subprocess.check_output(["git", "describe"]))
     thread.start_new_thread(manager.run, (configer,))
     time.sleep(1)
