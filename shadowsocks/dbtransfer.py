@@ -138,7 +138,8 @@ class DbTransfer(object):
                 req = urllib2.Request(url, data)
                 response = urllib2.urlopen(req)
                 the_page = response.read()
-                logging.info('%s - %s - %s' % (url, data, the_page))
+                if config.SS_VERBOSE:
+                    logging.info('%s - %s - %s' % (url, data, the_page))
 
                 # load info
                 url = config.API_URL + '/nodes/' + config.NODE_ID + '/info?key=' + config.API_PASS
