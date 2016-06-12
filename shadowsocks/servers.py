@@ -33,10 +33,6 @@ import manager
 from dbtransfer import DbTransfer
 
 
-def handler_SIGQUIT():
-    return
-
-
 def main():
     configer = {
         'server': config.SS_BIND_IP,
