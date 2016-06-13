@@ -123,7 +123,6 @@ class DbTransfer(object):
                     data = {'d': tran, 'node_id': config.NODE_ID, 'u': '0'}
                     url = config.API_URL + '/users/' + str(rows[0][0]) + '/traffic?key=' + config.API_PASS
                     data = urllib.urlencode(data)
-                    urllib2.Request(url, data)
                     req = urllib2.Request(url, data)
                     response = urllib2.urlopen(req)
                     the_page = response.read()
@@ -134,11 +133,11 @@ class DbTransfer(object):
                 data = {'count': i}
                 url = config.API_URL + '/nodes/' + config.NODE_ID + '/online_count?key=' + config.API_PASS
                 data = urllib.urlencode(data)
-                urllib2.Request(url, data)
                 req = urllib2.Request(url, data)
                 response = urllib2.urlopen(req)
                 the_page = response.read()
-                logging.info('%s - %s - %s' % (url, data, the_page))
+                if config.SS_VERBOSE:
+                    logging.info('%s - %s - %s' % (url, data, the_page))
 
                 # load info
                 url = config.API_URL + '/nodes/' + config.NODE_ID + '/info?key=' + config.API_PASS
@@ -152,7 +151,6 @@ class DbTransfer(object):
                 f.close()
                 data = {'load': loadavg, 'uptime': uptime}
                 data = urllib.urlencode(data)
-                urllib2.Request(url, data)
                 req = urllib2.Request(url, data)
                 response = urllib2.urlopen(req)
                 the_page = response.read()
