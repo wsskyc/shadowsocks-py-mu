@@ -46,7 +46,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../'))
 import manager
 from dbtransfer import DbTransfer
 
-if os.path.isdir('.git'):
+if os.path.isdir('../.git'):
     import subprocess
     VERSION = subprocess.check_output(["git", "describe"])
 else:
