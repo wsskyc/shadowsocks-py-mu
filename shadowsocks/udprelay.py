@@ -303,9 +303,10 @@ class UDPRelay(object):
             # simply drop that packet
             pass
 
-    def _ota_chunk_data_gen(self, key, iv, data):
+    @staticmethod
+    def _ota_chunk_data_gen(key, iv, data):
         data = common.chr(common.ord(data[0]) | ADDRTYPE_AUTH) + data[1:]
-        key = iv + key
+        key += iv
         return data + onetimeauth_gen(data, key)
 
     def add_to_loop(self, loop):
