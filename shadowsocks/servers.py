@@ -45,7 +45,7 @@ if config.LOG_ENABLE:
 # Check whether the versions of config files match
 try:
     import config_example
-    if not CONFIG_VERSION in config || config.CONFIG_VERSION != config_example.CONFIG_VERSION:
+    if not hasattr(config, 'CONFIG_VERSION') or config.CONFIG_VERSION != config_example.CONFIG_VERSION:
         logging.error('Your configuration file is out-dated. Please update `config.py` according to `config.example.py`.')
         sys.exit('config out-dated')
 except ImportError:
