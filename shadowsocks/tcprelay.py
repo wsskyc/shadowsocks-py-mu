@@ -637,7 +637,7 @@ class TCPRelayHandler(object):
             logging.warn('unknown socket')
 
     def _log_error(self, e):
-        logging.error('U[%d] %s when handling connection from %s:%d' %
+        logging.error('U[%d] UDP %s when handling connection from %s:%d' %
                       (self._config['server_port'], e, self._client_address[0], self._client_address[1]))
 
     def destroy(self):
