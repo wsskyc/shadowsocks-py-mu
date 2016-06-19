@@ -321,10 +321,10 @@ if sys.platform == "win32":
     try:
         import pyuv
         EventLoop = UvEventLoop
-        logging.warn('using EventLoop as UvEventLoop')
+        logging.info('[Win32] Using EventLoop as UvEventLoop')
     except:
         logging.warn(
-            'using EventLoop as PyEventLoop. try install pyuv https://pypi.python.org/pypi/pyuv')
+            '[Win32] Using EventLoop as PyEventLoop. try install pyuv https://pypi.python.org/pypi/pyuv')
 
 
 # from tornado

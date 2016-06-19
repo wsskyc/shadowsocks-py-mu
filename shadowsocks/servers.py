@@ -24,7 +24,7 @@ import time
 try:
     import config
 except ImportError:
-    print('[ERROR] Please rename `config.example.py` to `config.py` first!')
+    print('[ERROR] Please rename `config_example.py` to `config.py` first!')
     sys.exit('config not found')
 # For those system do not have thread (or _thread in Python 3)
 try:
@@ -57,7 +57,7 @@ from dbtransfer import DbTransfer
 
 if os.path.isdir('../.git'):
     import subprocess
-    VERSION = subprocess.check_output(["git", "describe"])
+    VERSION = subprocess.check_output(["git", "describe", "--tags"])
 else:
     VERSION = '3.0.1'
 
