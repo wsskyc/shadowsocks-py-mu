@@ -57,7 +57,11 @@ from dbtransfer import DbTransfer
 
 if os.path.isdir('../.git'):
     import subprocess
-    VERSION = subprocess.check_output(["git", "describe", "--tags"])
+    if "check_output" not in dir(subprocess):
+        # Compatible with Python < 2.7
+        VERSION = subprocess.Popen(["git", "describe", "--tags"], stdout=subprocess.PIPE).communicate()[0]
+    else:
+        VERSION = subprocess.check_output(["git", "describe", "--tags"])
 else:
     VERSION = '3.0.1'
 
