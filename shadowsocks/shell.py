@@ -23,13 +23,17 @@ import json
 import sys
 import getopt
 import logging
+import config
 from shadowsocks.common import to_bytes, to_str, IPNetwork
 from shadowsocks import encrypt
 
 
 VERBOSE_LEVEL = 5
 
-verbose = 0
+if config.SS_VERBOSE:
+    verbose = 1
+else:
+    verbose = 0
 
 
 def check_python():

@@ -283,8 +283,6 @@ class TCPRelayHandler(object):
                     self.destroy()
                 else:
                     shell.print_exception(e)
-                    if self._config['verbose']:
-                        traceback.print_exc()
                     self.destroy()
 
     def _handle_stage_addr(self, data):
@@ -318,7 +316,7 @@ class TCPRelayHandler(object):
                     return
             header_result = parse_header(data)
             if header_result is None:
-                raise Exception('U[%d] Can not parse header' %
+                raise Exception('U[%d] TCP Can not parse header' %
                                 self._config['server_port'])
             addrtype, remote_addr, remote_port, header_length = header_result
             if remote_port in self._config['banned_ports']:
@@ -336,14 +334,14 @@ class TCPRelayHandler(object):
                 # spec https://shadowsocks.org/en/spec/one-time-auth.html
                 if self._ota_enable or (addrtype & ADDRTYPE_AUTH == ADDRTYPE_AUTH):
                     if len(data) < header_length + ONETIMEAUTH_BYTES:
-                        logging.warn('one time auth header is too short')
+                        logging.warn('U[%d] One time auth header is too short' % self._config['server_port'])
                         return None
                     offset = header_length + ONETIMEAUTH_BYTES
                     _hash = data[header_length: offset]
                     _data = data[:header_length]
                     key = self._encryptor.decipher_iv + self._encryptor.key
                     if onetimeauth_verify(_hash, _data, key) is False:
-                        logging.warn('one time auth fail')
+                        logging.warn('U[%d] One time auth fail' % self._config['server_port'])
                         self.destroy()
                     header_length += ONETIMEAUTH_BYTES
             self._remote_address = (common.to_str(remote_addr), remote_port)
@@ -441,8 +439,6 @@ class TCPRelayHandler(object):
                 return
             except Exception as e:
                 shell.print_exception(e)
-                if self._config['verbose']:
-                    traceback.print_exc()
         self.destroy()
 
     def _write_to_sock_remote(self, data):
@@ -569,8 +565,6 @@ class TCPRelayHandler(object):
             self._write_to_sock(data, self._local_sock)
         except Exception as e:
             shell.print_exception(e)
-            if self._config['verbose']:
-                traceback.print_exc()
             # TODO use logging when debug completed
             self.destroy()
 
@@ -713,7 +707,7 @@ class TCPRelay(object):
                 server_socket.setsockopt(socket.SOL_TCP, 23, 5)
             except socket.error:
                 logging.warning(
-                    'fast open is not available, automatically turned off')
+                    'Fast open is not available, automatically turned off')
                 self._config['fast_open'] = False
         server_socket.listen(1024)
         self._server_socket = server_socket
@@ -814,8 +808,6 @@ class TCPRelay(object):
                     return
                 else:
                     shell.print_exception(err)
-                    if self._config['verbose']:
-                        traceback.print_exc()
         else:
             if sock:
                 handler = self._fd_to_handlers.get(fd, None)
@@ -830,7 +822,7 @@ class TCPRelay(object):
                 self._eventloop.remove(self._server_socket)
                 self._server_socket.close()
                 self._server_socket = None
-                logging.info('closed TCP port %d', self._listen_port)
+                logging.info('TCP port %d closed', self._listen_port)
             if not self._fd_to_handlers:
                 logging.info('stopping')
                 self._eventloop.stop()
