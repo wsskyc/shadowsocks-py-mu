@@ -1,7 +1,9 @@
 # !!! Please rename this file as config.py BEFORE editing it !!!
 
 import logging
-# !!! Do NOT touch this line !!!
+# !!! Only edit this line when you update your configuration file !!!
+# After you update, the value of CONFIG_VERSION in config.py and
+# config_example.py should be the same in order to start the server
 CONFIG_VERSION = '20160623-1'
 
 # Database Config
