@@ -46,7 +46,7 @@ if config.LOG_ENABLE:
 try:
     import config_example
     if not hasattr(config, 'CONFIG_VERSION') or config.CONFIG_VERSION != config_example.CONFIG_VERSION:
-        logging.error('Your configuration file is out-dated. Please update `config.py` according to `config.example.py`.')
+        logging.error('Your configuration file is out-dated. Please update `config.py` according to `config_example.py`.')
         sys.exit('config out-dated')
 except ImportError:
     logging.error('DO NOT delete the example configuration! Please re-upload it or use `git reset` to recover the file!')

@@ -56,7 +56,7 @@ SS_FIREWALL_MODE = 'blacklist'
 # Only Ban these target ports (for blacklist mode)
 SS_BAN_PORTS = [22, 23, 25]
 # Only Allow these target ports (for whitelist mode)
-SS_ALLOW_PORTS = [80, 443]
+SS_ALLOW_PORTS = [53, 80, 443, 8080, 8081]
 # Trusted users (all target ports will be not be blocked for these users)
 SS_FIREWALL_TRUSTED = [443]
 
