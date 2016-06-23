@@ -236,11 +236,11 @@ class DbTransfer(object):
         for index in range(len(config.SS_SKIP_PORTS)):
             port = config.SS_SKIP_PORTS[index]
             if config.SS_VERBOSE:
-                logging.info('db skipped port %s' % port)
+                logging.info('db skipped port %d' % port)
             if index == 0:
-                string = ' WHERE `port`<>%s' % port
+                string = ' WHERE `port`<>%d' % port
             else:
-                string = '%s AND `port`<>%s' % (string, port)
+                string = '%s AND `port`<>%d' % (string, port)
         conn = cymysql.connect(host=config.MYSQL_HOST, port=config.MYSQL_PORT, user=config.MYSQL_USER,
                                passwd=config.MYSQL_PASS, db=config.MYSQL_DB, charset='utf8')
         cur = conn.cursor()

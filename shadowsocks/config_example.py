@@ -2,7 +2,7 @@
 
 import logging
 # !!! Do NOT touch this line !!!
-CONFIG_VERSION = '20160618-1'
+CONFIG_VERSION = '20160623-1'
 
 # Database Config
 MYSQL_HOST = 'mengsky.net'
@@ -18,7 +18,7 @@ MANAGE_PASS = 'passwd'
 # if you want manage in other server you should set this value to global ip
 MANAGE_BIND_IP = '127.0.0.1'
 # make sure this port is idle
-MANAGE_PORT = 23333
+MANAGE_PORT = 65000
 
 # SS Panel API Setting
 # Version of Panel: V2 or V3. V2 not support API thus no need to change
@@ -45,10 +45,20 @@ SS_METHOD = 'aes-256-cfb'
 # OTA will still be enabled for the client if it sends an AUTH Address type(0x10)
 SS_OTA = False
 # Skip listening these ports
-SS_SKIP_PORTS = ['80']
-# Ban these outbound ports
-# Members should be INTEGERS
+SS_SKIP_PORTS = [80]
+
+# Firewall Settings
+# These settings are to prevent user from abusing your service
+SS_FIREWALL_ENABLED = True
+# Mode = whitelist or blacklist
+SS_FIREWALL_MODE = 'blacklist'
+# Member ports should be INTEGERS
+# Only Ban these target ports (for blacklist mode)
 SS_BAN_PORTS = [22, 23, 25]
+# Only Allow these target ports (for whitelist mode)
+SS_ALLOW_PORTS = [80, 443]
+# Trusted users (all target ports will be not be blocked for these users)
+SS_FIREWALL_TRUSTED = [443]
 
 # Shadowsocks Time Out
 # It should > 180s as some protocol has keep-alive packet of 3 min, Eg.: bt

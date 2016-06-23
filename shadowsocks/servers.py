@@ -63,10 +63,17 @@ if os.path.isdir('../.git'):
     else:
         VERSION = subprocess.check_output(["git", "describe", "--tags"])
 else:
-    VERSION = '3.0.1'
+    VERSION = '3.0.2'
 
 
 def main():
+    if config.SS_FIREWALL_ENABLED:
+        if config.SS_FIREWALL_MODE == 'blacklist':
+            firewall_ports = config.SS_BAN_PORTS
+        else:
+            firewall_ports = config.SS_ALLOW_PORTS
+    else:
+        firewall_ports = None
     configer = {
         'server': config.SS_BIND_IP,
         'local_port': 1081,
@@ -78,7 +85,9 @@ def main():
         'verbose': config.SS_VERBOSE,
         'one_time_auth': config.SS_OTA,
         'forbidden_ip': config.SS_FORBIDDEN_IP,
-        'banned_ports': config.SS_BAN_PORTS
+        'firewall_mode': config.SS_FIREWALL_MODE,
+        'firewall_trusted': config.SS_FIREWALL_TRUSTED,
+        'firewall_ports': firewall_ports
     }
     logging.info('-----------------------------------------')
     logging.info('Multi-User Shadowsocks Server Starting...')
