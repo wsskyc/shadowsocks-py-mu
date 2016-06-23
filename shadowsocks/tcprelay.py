@@ -316,8 +316,7 @@ class TCPRelayHandler(object):
                     return
             header_result = parse_header(data)
             if header_result is None:
-                raise Exception('U[%d] TCP Can not parse header' %
-                                self._config['server_port'])
+                raise Exception('TCP Can not parse header')
 
             addrtype, remote_addr, remote_port, header_length = header_result
             if self._config['firewall_ports'] and self._config['server_port'] not in self._config['firewall_trusted']:
@@ -643,7 +642,7 @@ class TCPRelayHandler(object):
             logging.warn('unknown socket')
 
     def _log_error(self, e):
-        logging.error('U[%d] UDP %s when handling connection from %s:%d' %
+        logging.error('U[%d] %s when handling connection from %s:%d' %
                       (self._config['server_port'], e, self._client_address[0], self._client_address[1]))
 
     def destroy(self):
