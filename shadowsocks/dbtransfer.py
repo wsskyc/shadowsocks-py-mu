@@ -51,8 +51,11 @@ class DbTransfer(object):
             cli.close()
             # TODO: bad way solve timed out
             time.sleep(0.05)
-        except:
-            logging.warn('send_command response')
+        except Exception as e:
+            if config.SS_VERBOSE:
+                import traceback
+                traceback.print_exc()
+            logging.warn('send_command exception: %s' % e)
         return data
 
     @staticmethod
