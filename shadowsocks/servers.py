@@ -63,7 +63,7 @@ if os.path.isdir('../.git'):
     else:
         VERSION = subprocess.check_output(["git", "describe", "--tags"])
 else:
-    VERSION = '3.0.2'
+    VERSION = '3.1.0'
 
 
 def main():
@@ -92,9 +92,9 @@ def main():
     logging.info('-----------------------------------------')
     logging.info('Multi-User Shadowsocks Server Starting...')
     logging.info('Current Server Version: %s' % VERSION)
-    if config.PANEL_VERSION != 'V3':
-        logging.warn('Not support ss-panel version: %s' % config.PANEL_VERSION)
-        logging.warn('Please upgrade your ss-panel to V3 to enable all features.')
+    if config.API_ENABLED:
+        logging.warn('Now using MultiUser API as the user interface')
+        logging.warn('Now using MySQL Database as the user interface')
     thread.start_new_thread(manager.run, (configer,))
     time.sleep(1)
     thread.start_new_thread(DbTransfer.thread_db, ())
