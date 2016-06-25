@@ -237,6 +237,11 @@ class DbTransfer(object):
     @staticmethod
     def pull_db_all_user():
         if config.API_ENABLED:
+            rows = DbTransfer.pull_api_user()
+            if config.SS_VERBOSE:
+                logging.info('api downloaded')
+            return rows
+        else:
             string = ''
             for index in range(len(config.SS_SKIP_PORTS)):
                 port = config.SS_SKIP_PORTS[index]
@@ -260,10 +265,6 @@ class DbTransfer(object):
             if config.SS_VERBOSE:
                 logging.info('db downloaded')
             return rows
-        else:
-            if config.SS_VERBOSE:
-                logging.info('api downloaded')
-            return DbTransfer.pull_api_user()
 
     @staticmethod
     def pull_api_user(port=None):
