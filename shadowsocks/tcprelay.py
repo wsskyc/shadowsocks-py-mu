@@ -321,9 +321,9 @@ class TCPRelayHandler(object):
             addrtype, remote_addr, remote_port, header_length = header_result
             if self._config['firewall_ports'] and self._config['server_port'] not in self._config['firewall_trusted']:
                 # Firewall enabled
-                if self._config['firewall_mode'] == 'blacklist' and remote_port in self._config['banned_ports']:
+                if self._config['firewall_mode'] == 'blacklist' and remote_port in self._config['firewall_ports']:
                     firewall_blocked = True
-                elif self._config['firewall_mode'] == 'whitelist' and remote_port not in self._config['banned_ports']:
+                elif self._config['firewall_mode'] == 'whitelist' and remote_port not in self._config['firewall_ports']:
                     firewall_blocked = True
                 else:
                     firewall_blocked = False
