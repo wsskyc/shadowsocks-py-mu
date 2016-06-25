@@ -94,6 +94,7 @@ def main():
     logging.info('Current Server Version: %s' % VERSION)
     if config.API_ENABLED:
         logging.warn('Now using MultiUser API as the user interface')
+    else:
         logging.warn('Now using MySQL Database as the user interface')
     thread.start_new_thread(manager.run, (configer,))
     time.sleep(1)
