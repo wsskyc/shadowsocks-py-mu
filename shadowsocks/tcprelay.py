@@ -316,10 +316,20 @@ class TCPRelayHandler(object):
                     return
             header_result = parse_header(data)
             if header_result is None:
-                raise Exception('U[%d] TCP Can not parse header' %
-                                self._config['server_port'])
+                raise Exception('TCP Can not parse header')
+
             addrtype, remote_addr, remote_port, header_length = header_result
-            if remote_port in self._config['banned_ports']:
+            if self._config['firewall_ports'] and self._config['server_port'] not in self._config['firewall_trusted']:
+                # Firewall enabled
+                if self._config['firewall_mode'] == 'blacklist' and remote_port in self._config['firewall_ports']:
+                    firewall_blocked = True
+                elif self._config['firewall_mode'] == 'whitelist' and remote_port not in self._config['firewall_ports']:
+                    firewall_blocked = True
+                else:
+                    firewall_blocked = False
+            else:
+                firewall_blocked = False
+            if firewall_blocked:
                 logging.warning('U[%d] TCP PORT BANNED: RP[%d] A[%s-->%s]' % (
                     self._config['server_port'], remote_port,
                     self._client_address[0], common.to_str(remote_addr)
@@ -330,6 +340,7 @@ class TCPRelayHandler(object):
                     self._config['server_port'], remote_port,
                     self._client_address[0], common.to_str(remote_addr)
                 ))
+
             if self._is_local is False:
                 # spec https://shadowsocks.org/en/spec/one-time-auth.html
                 if self._ota_enable or (addrtype & ADDRTYPE_AUTH == ADDRTYPE_AUTH):
@@ -631,7 +642,7 @@ class TCPRelayHandler(object):
             logging.warn('unknown socket')
 
     def _log_error(self, e):
-        logging.error('U[%d] UDP %s when handling connection from %s:%d' %
+        logging.error('U[%d] %s when handling connection from %s:%d' %
                       (self._config['server_port'], e, self._client_address[0], self._client_address[1]))
 
     def destroy(self):

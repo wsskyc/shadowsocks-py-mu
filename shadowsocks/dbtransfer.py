@@ -22,6 +22,9 @@ import time
 import socket
 import config
 import json
+import urllib
+# TODO: urllib2 does not exist in python 3.5+
+import urllib2
 
 
 class DbTransfer(object):
@@ -48,8 +51,11 @@ class DbTransfer(object):
             cli.close()
             # TODO: bad way solve timed out
             time.sleep(0.05)
-        except:
-            logging.warn('send_command response')
+        except Exception as e:
+            if config.SS_VERBOSE:
+                import traceback
+                traceback.print_exc()
+            logging.warn('send_command exception: %s' % e)
         return data
 
     @staticmethod
@@ -69,29 +75,82 @@ class DbTransfer(object):
         return dt_transfer
 
     def push_db_all_user(self):
-        import urllib2, urllib
-        import time
         dt_transfer = self.get_servers_transfer()
 
-        if config.PANEL_VERSION == 'V2':
+        if config.API_ENABLED:
+            i = 0
+            if config.SS_VERBOSE:
+                logging.info('api upload: pushing transfer statistics')
+            for port in dt_transfer.keys():
+                user = DbTransfer.pull_api_user(port)
+                if config.SS_VERBOSE:
+                    logging.info('port:%s ----> id:%s' % (port, user[0]))
+                tran = str(dt_transfer[port])
+                data = {'d': tran, 'node_id': config.NODE_ID, 'u': '0'}
+                url = config.API_URL + '/users/' + \
+                    str(user[0]) + '/traffic?key=' + config.API_PASS
+                data = urllib.urlencode(data)
+                req = urllib2.Request(url, data)
+                response = urllib2.urlopen(req)
+                the_page = response.read()
+                if config.SS_VERBOSE:
+                    logging.info('%s - %s - %s' % (url, data, the_page))
+                i += 1
+
+            # online user count
+            if config.SS_VERBOSE:
+                logging.info('api upload: pushing online user count')
+            data = {'count': i}
+            url = config.API_URL + '/nodes/' + config.NODE_ID + \
+                '/online_count?key=' + config.API_PASS
+            data = urllib.urlencode(data)
+            req = urllib2.Request(url, data)
+            response = urllib2.urlopen(req)
+            the_page = response.read()
+            if config.SS_VERBOSE:
+                logging.info('%s - %s - %s' % (url, data, the_page))
+
+            # load info
+            if config.SS_VERBOSE:
+                logging.info('api upload: pushing node status')
+            url = config.API_URL + '/nodes/' + config.NODE_ID + '/info?key=' + config.API_PASS
+            f = open("/proc/loadavg")
+            load = f.read().split()
+            f.close()
+            loadavg = load[0] + ' ' + load[1] + ' ' + \
+                load[2] + ' ' + load[3] + ' ' + load[4]
+            f = open("/proc/uptime")
+            uptime = f.read().split()
+            uptime = uptime[0]
+            f.close()
+            data = {'load': loadavg, 'uptime': uptime}
+            data = urllib.urlencode(data)
+            req = urllib2.Request(url, data)
+            response = urllib2.urlopen(req)
+            the_page = response.read()
+            if config.SS_VERBOSE:
+                logging.info('%s - %s - %s' % (url, data, the_page))
+                logging.info('api uploaded')
+        else:
             query_head = 'UPDATE `user`'
             query_sub_when = ''
             query_sub_when2 = ''
             query_sub_in = None
             last_time = time.time()
-            for id in dt_transfer.keys():
-                query_sub_when += ' WHEN %s THEN `u`+%s' % (id, 0)  # all in d
-                query_sub_when2 += ' WHEN %s THEN `d`+%s' % (id, dt_transfer[id])
+            for port in dt_transfer.keys():
+                query_sub_when += ' WHEN %s THEN `u`+%s' % (port, 0)  # all in d
+                query_sub_when2 += ' WHEN %s THEN `d`+%s' % (
+                    port, dt_transfer[port])
                 if query_sub_in is not None:
-                    query_sub_in += ',%s' % id
+                    query_sub_in += ',%s' % port
                 else:
-                    query_sub_in = '%s' % id
+                    query_sub_in = '%s' % port
             if query_sub_when == '':
                 return
             query_sql = query_head + ' SET u = CASE port' + query_sub_when + \
-                        ' END, d = CASE port' + query_sub_when2 + \
-                        ' END, t = ' + str(int(last_time)) + \
-                        ' WHERE port IN (%s)' % query_sub_in
+                ' END, d = CASE port' + query_sub_when2 + \
+                ' END, t = ' + str(int(last_time)) + \
+                ' WHERE port IN (%s)' % query_sub_in
             # print query_sql
             conn = cymysql.connect(host=config.MYSQL_HOST, port=config.MYSQL_PORT, user=config.MYSQL_USER,
                                    passwd=config.MYSQL_PASS, db=config.MYSQL_DB, charset='utf8')
@@ -101,62 +160,7 @@ class DbTransfer(object):
             conn.commit()
             conn.close()
             if config.SS_VERBOSE:
-                logging.info('db upload')
-        else:
-            if config.PANEL_VERSION == 'V3':
-                i = 0
-                for id in dt_transfer.keys():
-                    string = ' WHERE `port` = %s' % id
-                    conn = cymysql.connect(host=config.MYSQL_HOST, port=config.MYSQL_PORT, user=config.MYSQL_USER,
-                                           passwd=config.MYSQL_PASS, db=config.MYSQL_DB, charset='utf8')
-                    cur = conn.cursor()
-                    cur.execute('SELECT id FROM %s%s '
-                                % (config.MYSQL_USER_TABLE, string))
-                    rows = []
-                    for r in cur.fetchall():
-                        rows.append(list(r))
-                    cur.close()
-                    conn.close()
-                    if config.SS_VERBOSE:
-                        logging.info('port:%s ----> id:%s' % (id, rows[0][0]))
-                    tran = str(dt_transfer[id])
-                    data = {'d': tran, 'node_id': config.NODE_ID, 'u': '0'}
-                    url = config.API_URL + '/users/' + str(rows[0][0]) + '/traffic?key=' + config.API_PASS
-                    data = urllib.urlencode(data)
-                    req = urllib2.Request(url, data)
-                    response = urllib2.urlopen(req)
-                    the_page = response.read()
-                    if config.SS_VERBOSE:
-                        logging.info('%s - %s - %s' % (url, data, the_page))
-                    i += 1
-                # online user count
-                data = {'count': i}
-                url = config.API_URL + '/nodes/' + config.NODE_ID + '/online_count?key=' + config.API_PASS
-                data = urllib.urlencode(data)
-                req = urllib2.Request(url, data)
-                response = urllib2.urlopen(req)
-                the_page = response.read()
-                if config.SS_VERBOSE:
-                    logging.info('%s - %s - %s' % (url, data, the_page))
-
-                # load info
-                url = config.API_URL + '/nodes/' + config.NODE_ID + '/info?key=' + config.API_PASS
-                f = open("/proc/loadavg")
-                load = f.read().split()
-                f.close()
-                loadavg = load[0]+' '+load[1]+' '+load[2]+' '+load[3]+' '+load[4]
-                f = open("/proc/uptime")
-                time = f.read().split()
-                uptime = time[0]
-                f.close()
-                data = {'load': loadavg, 'uptime': uptime}
-                data = urllib.urlencode(data)
-                req = urllib2.Request(url, data)
-                response = urllib2.urlopen(req)
-                the_page = response.read()
-                if config.SS_VERBOSE:
-                    logging.info('%s - %s - %s' % (url, data, the_page))
-
+                logging.info('db uploaded')
 
     @staticmethod
     def del_server_out_of_bound_safe(rows):
@@ -185,7 +189,7 @@ class DbTransfer(object):
                 else:
                     if not config.CUSTOM_METHOD:
                         row[7] = config.SS_METHOD
-                    if server['method'] != row[7] :
+                    if server['method'] != row[7]:
                         # encryption method changed
                         logging.info(
                             'db stop server at port [%d] reason: encryption method changed' % row[0])
@@ -226,32 +230,78 @@ class DbTransfer(object):
                 import traceback
                 if config.SS_VERBOSE:
                     traceback.print_exc()
-                logging.warn('db thread except:%s' % e)
+                logging.error('db thread except:%s' % e)
             finally:
                 time.sleep(config.SYNCTIME)
 
     @staticmethod
     def pull_db_all_user():
-        string = ''
-        for index in range(len(config.SS_SKIP_PORTS)):
-            port = config.SS_SKIP_PORTS[index]
+        if config.API_ENABLED:
+            rows = DbTransfer.pull_api_user()
             if config.SS_VERBOSE:
-                logging.info('db skipped port %s' % port)
-            if index == 0:
-                string = ' WHERE `port`<>%s' % port
-            else:
-                string = '%s AND `port`<>%s' % (string, port)
-        conn = cymysql.connect(host=config.MYSQL_HOST, port=config.MYSQL_PORT, user=config.MYSQL_USER,
-                               passwd=config.MYSQL_PASS, db=config.MYSQL_DB, charset='utf8')
-        cur = conn.cursor()
-        cur.execute('SELECT port, u, d, transfer_enable, passwd, switch, enable, method, email FROM %s%s ORDER BY `port` ASC'
-                    % (config.MYSQL_USER_TABLE, string))
-        rows = []
-        for r in cur.fetchall():
-            rows.append(list(r))
-        # Release resources
-        cur.close()
-        conn.close()
-        if config.SS_VERBOSE:
-            logging.info('db downloaded')
-        return rows
+                logging.info('api downloaded')
+            return rows
+        else:
+            string = ''
+            for index in range(len(config.SS_SKIP_PORTS)):
+                port = config.SS_SKIP_PORTS[index]
+                if config.SS_VERBOSE:
+                    logging.info('db skipped port %d' % port)
+                if index == 0:
+                    string = ' WHERE `port`<>%d' % port
+                else:
+                    string = '%s AND `port`<>%d' % (string, port)
+            conn = cymysql.connect(host=config.MYSQL_HOST, port=config.MYSQL_PORT, user=config.MYSQL_USER,
+                                   passwd=config.MYSQL_PASS, db=config.MYSQL_DB, charset='utf8')
+            cur = conn.cursor()
+            cur.execute('SELECT port, u, d, transfer_enable, passwd, switch, enable, method, email FROM %s%s ORDER BY `port` ASC'
+                        % (config.MYSQL_USER_TABLE, string))
+            rows = []
+            for r in cur.fetchall():
+                rows.append(list(r))
+            # Release resources
+            cur.close()
+            conn.close()
+            if config.SS_VERBOSE:
+                logging.info('db downloaded')
+            return rows
+
+    @staticmethod
+    def pull_api_user(port=None):
+        url = config.API_URL + '/users?key=' + config.API_PASS
+        f = urllib.urlopen(url)
+        data = json.load(f)
+        f.close()
+        if port:
+            for user in data['data']:
+                if user['port'] == port:
+                    return [
+                        user['port'],
+                        user['u'],
+                        user['d'],
+                        user['transfer_enable'],
+                        user['passwd'],
+                        user['switch'],
+                        user['enable'],
+                        user['method'],
+                        user['email']
+                    ]
+        else:
+            rows = []
+            for user in data['data']:
+                if user['port'] in config.SS_SKIP_PORTS:
+                    if config.SS_VERBOSE:
+                        logging.info('api skipped port %d' % user['port'])
+                else:
+                    rows.append([
+                        user['port'],
+                        user['u'],
+                        user['d'],
+                        user['transfer_enable'],
+                        user['passwd'],
+                        user['switch'],
+                        user['enable'],
+                        user['method'],
+                        user['email']
+                    ])
+            return rows

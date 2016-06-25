@@ -1,25 +1,34 @@
 About shadowsocks-python manyuser
 =================================
-This is a multi-user version of shadowsocks-python. Requires a mysql database.
+This is a multi-user version of shadowsocks-python. Requires a mysql database or a panel support SS MU API.
 
-Install
--------
-1. install MySQL 5.x.x
+Install instruction for database user
+-------------------------------------
+1. install MySQL Server 5.x.x
 2. install cymysql library by `pip install cymysql`
 3. create a database named `shadowsocks`
 4. import `shadowsocks.sql` into `shadowsocks`
 5. copy `config_example.py` to `config.py` and edit it following the notes inside (but DO NOT delete the example file)
 6. TestRun `cd shadowsocks && python servers.py` (not server.py)
 
+Install instruction for MU API user
+-----------------------------------
+1. install a panel which supports MU API (the known one is [SS-Panel V3](https://github.com/orvice/ss-panel))
+2. copy `config_example.py` to `config.py` and edit it following the notes inside (but DO NOT delete the example file)
+3. TestRun `cd shadowsocks && python servers.py` (not server.py)
+
+
 if no exception the server will startup. By default logging is enabled.
 You should be able to see this kind of thing in `shadowsocks.log`(default log file name)
 ```
-May 25 23:03:16 INFO Multi-User Shadowsocks Server Starting...
-May 25 23:03:17 INFO Current Server Version: 2.8.3-83-gf8dd2f8
+Jun 24 01:06:08 INFO -----------------------------------------
+Jun 24 01:06:08 INFO Multi-User Shadowsocks Server Starting...
+Jun 24 01:06:08 INFO Current Server Version: 3.1.0-1-gc2ac618
 
-May 25 23:03:18 INFO db skipped port 443
-May 25 23:03:19 INFO db downloaded
-May 25 23:03:19 INFO Server Added:   P[XXXX], M[aes-256-cfb], E[XXX@XXX.XXX]
+Jun 24 01:10:11 INFO api downloaded
+Jun 24 01:10:13 INFO api skipped port 443
+Jun 24 01:10:13 INFO Server Added:   P[XXXXX], M[rc4-md5], E[XXXXX@gmail.com]
+Jun 24 01:10:13 INFO Server Added:   P[XXXXX], M[rc4-md5], E[XXXXX@gmail.com]
 ```
 
 Explanation of the log output
@@ -58,7 +67,7 @@ Database user table column
 
 Compatibility with other frontend UIs
 -------------------------------------
-It is compatible with [ss-panel](https://github.com/orvice/ss-panel).
+It is fully compatible (SS MU API) with [ss-panel V3](https://github.com/orvice/ss-panel).
 
 Open source license
 -------------------

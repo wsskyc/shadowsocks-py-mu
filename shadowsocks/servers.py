@@ -46,7 +46,7 @@ if config.LOG_ENABLE:
 try:
     import config_example
     if not hasattr(config, 'CONFIG_VERSION') or config.CONFIG_VERSION != config_example.CONFIG_VERSION:
-        logging.error('Your configuration file is out-dated. Please update `config.py` according to `config.example.py`.')
+        logging.error('Your configuration file is out-dated. Please update `config.py` according to `config_example.py`.')
         sys.exit('config out-dated')
 except ImportError:
     logging.error('DO NOT delete the example configuration! Please re-upload it or use `git reset` to recover the file!')
@@ -63,10 +63,17 @@ if os.path.isdir('../.git'):
     else:
         VERSION = subprocess.check_output(["git", "describe", "--tags"])
 else:
-    VERSION = '3.0.1'
+    VERSION = '3.1.0'
 
 
 def main():
+    if config.SS_FIREWALL_ENABLED:
+        if config.SS_FIREWALL_MODE == 'blacklist':
+            firewall_ports = config.SS_BAN_PORTS
+        else:
+            firewall_ports = config.SS_ALLOW_PORTS
+    else:
+        firewall_ports = None
     configer = {
         'server': config.SS_BIND_IP,
         'local_port': 1081,
@@ -78,14 +85,17 @@ def main():
         'verbose': config.SS_VERBOSE,
         'one_time_auth': config.SS_OTA,
         'forbidden_ip': config.SS_FORBIDDEN_IP,
-        'banned_ports': config.SS_BAN_PORTS
+        'firewall_mode': config.SS_FIREWALL_MODE,
+        'firewall_trusted': config.SS_FIREWALL_TRUSTED,
+        'firewall_ports': firewall_ports
     }
     logging.info('-----------------------------------------')
     logging.info('Multi-User Shadowsocks Server Starting...')
     logging.info('Current Server Version: %s' % VERSION)
-    if config.PANEL_VERSION != 'V3':
-        logging.warn('Not support ss-panel version: %s' % config.PANEL_VERSION)
-        logging.warn('Please upgrade your ss-panel to V3 to enable all features.')
+    if config.API_ENABLED:
+        logging.warn('Now using MultiUser API as the user interface')
+    else:
+        logging.warn('Now using MySQL Database as the user interface')
     thread.start_new_thread(manager.run, (configer,))
     time.sleep(1)
     thread.start_new_thread(DbTransfer.thread_db, ())

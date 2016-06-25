@@ -185,7 +185,17 @@ class UDPRelay(object):
             return
         addrtype, dest_addr, dest_port, header_length = header_result
 
-        if dest_port in self._config['banned_ports']:
+        if self._config['firewall_ports'] and self._config['server_port'] not in self._config['firewall_trusted']:
+            # Firewall enabled
+            if self._config['firewall_mode'] == 'blacklist' and dest_port in self._config['firewall_ports']:
+                firewall_blocked = True
+            elif self._config['firewall_mode'] == 'whitelist' and dest_port not in self._config['firewall_ports']:
+                firewall_blocked = True
+            else:
+                firewall_blocked = False
+        else:
+            firewall_blocked = False
+        if firewall_blocked:
             logging.warning('U[%d] UDP PORT BANNED: RP[%d] A[%s-->%s]' % (
                 self._config['server_port'], dest_port,
                 client_address, common.to_str(dest_addr)
