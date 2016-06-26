@@ -17,7 +17,6 @@
 # under the License.
 
 import logging
-import cymysql
 import time
 import socket
 import config
@@ -25,7 +24,8 @@ import json
 import urllib
 # TODO: urllib2 does not exist in python 3.5+
 import urllib2
-
+if not config.API_ENABLED:
+	import cymysql
 
 class DbTransfer(object):
 
@@ -81,8 +81,13 @@ class DbTransfer(object):
             i = 0
             if config.SS_VERBOSE:
                 logging.info('api upload: pushing transfer statistics')
+            users = DbTransfer.pull_api_user()
             for port in dt_transfer.keys():
-                user = DbTransfer.pull_api_user(port)
+            	user = None
+            	for result in users:
+            		if result[0] == port:
+            			user = result[9]
+            			break
                 if not user:
                     logging.warn('U[%s] User Not Found', port)
                     server = json.loads(DbTransfer.get_instance().send_command(
@@ -277,34 +282,28 @@ class DbTransfer(object):
             return rows
 
     @staticmethod
-    def pull_api_user(port=None):
+    def pull_api_user():
         # Node parameter is not included for the ORIGINAL version of SS-Panel V3
         url = config.API_URL + '/users?key=' + config.API_PASS + '&node=' + config.NODE_ID
         f = urllib.urlopen(url)
         data = json.load(f)
         f.close()
-        if port:
-            for user in data['data']:
-                if user['port'] == port:
-                    return user['id']
-            # User not found!
-            return None
-        else:
-            rows = []
-            for user in data['data']:
-                if user['port'] in config.SS_SKIP_PORTS:
-                    if config.SS_VERBOSE:
-                        logging.info('api skipped port %d' % user['port'])
-                else:
-                    rows.append([
-                        user['port'],
-                        user['u'],
-                        user['d'],
-                        user['transfer_enable'],
-                        user['passwd'],
-                        user['switch'],
-                        user['enable'],
-                        user['method'],
-                        user['email']
-                    ])
-            return rows
+        rows = []
+        for user in data['data']:
+            if user['port'] in config.SS_SKIP_PORTS:
+                if config.SS_VERBOSE:
+                    logging.info('api skipped port %d' % user['port'])
+            else:
+                rows.append([
+                    user['port'],
+                    user['u'],
+                    user['d'],
+                    user['transfer_enable'],
+                    user['passwd'],
+                    user['switch'],
+                    user['enable'],
+                    user['method'],
+                    user['email'],
+                    user['id']
+                ])
+        return rows

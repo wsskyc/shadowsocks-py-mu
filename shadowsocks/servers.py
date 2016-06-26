@@ -55,7 +55,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../'))
 import manager
 from dbtransfer import DbTransfer
 
-if os.path.isdir('../.git'):
+if os.path.isdir('../.git') and not os.path.isdir('../.nogit'):
     import subprocess
     if "check_output" not in dir(subprocess):
         # Compatible with Python < 2.7

@@ -17,8 +17,12 @@ Install instruction for MU API user
 2. copy `config_example.py` to `config.py` and edit it following the notes inside (but DO NOT delete the example file). You do not need to edit the MySQL Database section.
 3. TestRun `cd shadowsocks && python servers.py` (not server.py)
 
+Reminders for Windows User
+--------------------------
+1. install pyuv by `pip install pyuv`
+2. if git is not configured in your `%PATH%` environmental variable, you can create a file named `.nogit` to avoid using `git describe`
 
-if no exception the server will startup. By default logging is enabled.
+if no exception thown the server will startup. By default logging is enabled.
 You should be able to see this kind of thing in `shadowsocks.log`(default log file name)
 ```
 Jun 24 01:06:08 INFO -----------------------------------------
