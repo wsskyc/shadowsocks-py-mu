@@ -83,12 +83,22 @@ class DbTransfer(object):
                 logging.info('api upload: pushing transfer statistics')
             for port in dt_transfer.keys():
                 user = DbTransfer.pull_api_user(port)
+                if not user:
+                    logging.warn('U[%s] User Not Found', port)
+                    server = json.loads(DbTransfer.get_instance().send_command(
+                        'stat: {"server_port":%s}' % port))
+                    if server['stat'] != 'ko':
+                        logging.info(
+                            'U[%d] Server has been stopped: user is removed' % port)
+                        DbTransfer.send_command(
+                            'remove: {"server_port":%d}' % port)
+                    continue
                 if config.SS_VERBOSE:
-                    logging.info('port:%s ----> id:%s' % (port, user[0]))
+                    logging.info('U[%s] User ID Obtained:%s' % (port, user))
                 tran = str(dt_transfer[port])
                 data = {'d': tran, 'node_id': config.NODE_ID, 'u': '0'}
                 url = config.API_URL + '/users/' + \
-                    str(user[0]) + '/traffic?key=' + config.API_PASS
+                    str(user) + '/traffic?key=' + config.API_PASS
                 data = urllib.urlencode(data)
                 req = urllib2.Request(url, data)
                 response = urllib2.urlopen(req)
@@ -171,19 +181,19 @@ class DbTransfer(object):
                 if row[5] == 0 or row[6] == 0:
                     # stop disabled or switched-off user
                     logging.info(
-                        'db stop server at port [%d] reason: disable' % row[0])
+                        'U[%d] Server has been stopped: user is disabled' % row[0])
                     DbTransfer.send_command(
                         'remove: {"server_port":%d}' % row[0])
                 elif row[1] + row[2] >= row[3]:
                     # stop user that exceeds bandwidth limit
                     logging.info(
-                        'db stop server at port [%d] reason: out bandwidth' % row[0])
+                        'U[%d] Server has been stopped: bandwith exceeded' % row[0])
                     DbTransfer.send_command(
                         'remove: {"server_port":%d}' % row[0])
                 elif server['password'] != row[4]:
                     # password changed
                     logging.info(
-                        'db stop server at port [%d] reason: password changed' % row[0])
+                        'U[%d] Server is restarting: password is changed' % row[0])
                     DbTransfer.send_command(
                         'remove: {"server_port":%d}' % row[0])
                 else:
@@ -192,18 +202,18 @@ class DbTransfer(object):
                     if server['method'] != row[7]:
                         # encryption method changed
                         logging.info(
-                            'db stop server at port [%d] reason: encryption method changed' % row[0])
+                            'U[%d] Server is restarting: encryption method is changed' % row[0])
                         DbTransfer.send_command(
                             'remove: {"server_port":%d}' % row[0])
             else:
                 if row[5] == 1 and row[6] == 1 and row[1] + row[2] < row[3]:
-                    if config.MANAGE_BIND_IP != '127.0.0.1':
-                        logging.info(
-                            'db start server at port [%s] with password [%s] and method [%s]' % (row[0], row[4], row[7]))
                     if not config.CUSTOM_METHOD:
                         row[7] = config.SS_METHOD
                     DbTransfer.send_command(
                         'add: {"server_port": %d, "password":"%s", "method":"%s", "email":"%s"}' % (row[0], row[4], row[7], row[8]))
+                    if config.MANAGE_BIND_IP != '127.0.0.1':
+                        logging.info(
+                            'U[%s] Server Started with password [%s] and method [%s]' % (row[0], row[4], row[7]))
 
     @staticmethod
     def thread_db():
@@ -268,24 +278,17 @@ class DbTransfer(object):
 
     @staticmethod
     def pull_api_user(port=None):
-        url = config.API_URL + '/users?key=' + config.API_PASS
+        # Node parameter is not included for the ORIGINAL version of SS-Panel V3
+        url = config.API_URL + '/users?key=' + config.API_PASS + '&node=' + config.NODE_ID
         f = urllib.urlopen(url)
         data = json.load(f)
         f.close()
         if port:
             for user in data['data']:
                 if user['port'] == port:
-                    return [
-                        user['port'],
-                        user['u'],
-                        user['d'],
-                        user['transfer_enable'],
-                        user['passwd'],
-                        user['switch'],
-                        user['enable'],
-                        user['method'],
-                        user['email']
-                    ]
+                    return user['id']
+            # User not found!
+            return None
         else:
             rows = []
             for user in data['data']:

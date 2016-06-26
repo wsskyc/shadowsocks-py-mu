@@ -2,7 +2,7 @@
 
 import logging
 # !!! Only edit this line when you update your configuration file !!!
-# After you update, the value of CONFIG_VERSION in config.py and
+# After you update, the values of CONFIG_VERSION in config.py and
 # config_example.py should be the same in order to start the server
 CONFIG_VERSION = '20160623-2'
 
@@ -31,10 +31,10 @@ API_URL = 'http://domain/mu'
 API_PASS = 'mupass'
 NODE_ID = '1'
 
-# Time interval between 2 pulls from the database
-CHECKTIME = 15
-# Time interval between 2 pushes from the database
-SYNCTIME = 600
+# Time interval between 2 pulls from the database or API
+CHECKTIME = 30
+# Time interval between 2 pushes to the database or API
+SYNCTIME = 120
 # Choose True if you want to use custom method and False if you don't
 CUSTOM_METHOD = True
 

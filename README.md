@@ -1,6 +1,6 @@
 About shadowsocks-python manyuser
 =================================
-This is a multi-user version of shadowsocks-python. Requires a mysql database or a panel support SS MU API.
+This is a multi-user version of shadowsocks-python. Requires a mysql database or a panel which supports SS MU API.
 
 Install instruction for database user
 -------------------------------------
@@ -8,13 +8,13 @@ Install instruction for database user
 2. install cymysql library by `pip install cymysql`
 3. create a database named `shadowsocks`
 4. import `shadowsocks.sql` into `shadowsocks`
-5. copy `config_example.py` to `config.py` and edit it following the notes inside (but DO NOT delete the example file)
+5. copy `config_example.py` to `config.py` and edit it following the notes inside (but DO NOT delete the example file). You do not need to edit the API section.
 6. TestRun `cd shadowsocks && python servers.py` (not server.py)
 
 Install instruction for MU API user
 -----------------------------------
 1. install a panel which supports MU API (the known one is [SS-Panel V3](https://github.com/orvice/ss-panel))
-2. copy `config_example.py` to `config.py` and edit it following the notes inside (but DO NOT delete the example file)
+2. copy `config_example.py` to `config.py` and edit it following the notes inside (but DO NOT delete the example file). You do not need to edit the MySQL Database section.
 3. TestRun `cd shadowsocks && python servers.py` (not server.py)
 
 
