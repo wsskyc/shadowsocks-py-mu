@@ -94,9 +94,9 @@ class DbTransfer(object):
                         'stat: {"server_port":%s}' % port))
                     if server['stat'] != 'ko':
                         logging.info(
-                            'U[%d] Server has been stopped: user is removed' % port)
+                            'U[%s] Server has been stopped: user is removed' % port)
                         DbTransfer.send_command(
-                            'remove: {"server_port":%d}' % port)
+                            'remove: {"server_port":%s}' % port)
                     continue
                 if config.SS_VERBOSE:
                     logging.info('U[%s] User ID Obtained:%s' % (port, user))

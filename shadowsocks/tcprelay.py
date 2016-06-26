@@ -125,7 +125,6 @@ class TCPRelayHandler(object):
         self._data_to_write_to_remote = []
         self._upstream_status = WAIT_STATUS_READING
         self._downstream_status = WAIT_STATUS_INIT
-        self._client_address = local_sock.getpeername()[:2]
         self._remote_address = None
         if 'forbidden_ip' in config:
             self._forbidden_iplist = config['forbidden_ip']
@@ -287,6 +286,7 @@ class TCPRelayHandler(object):
 
     def _handle_stage_addr(self, data):
         try:
+            addr, port = self._local_sock.getsockname()[:2]
             if self._is_local:
                 cmd = common.ord(data[1])
                 if cmd == CMD_UDP_ASSOCIATE:
@@ -296,7 +296,6 @@ class TCPRelayHandler(object):
                         header = b'\x05\x00\x00\x04'
                     else:
                         header = b'\x05\x00\x00\x01'
-                    addr, port = self._local_sock.getsockname()[:2]
                     # TODO: inet_pton is added for windows in Py 3.4
                     addr_to_send = socket.inet_pton(self._local_sock.family,
                                                     addr)
@@ -332,13 +331,13 @@ class TCPRelayHandler(object):
             if firewall_blocked:
                 logging.warning('U[%d] TCP PORT BANNED: RP[%d] A[%s-->%s]' % (
                     self._config['server_port'], remote_port,
-                    self._client_address[0], common.to_str(remote_addr)
+                    addr, common.to_str(remote_addr)
                 ))
                 return
             else:
                 logging.info('U[%d] TCP CONN: RP[%d] A[%s-->%s]' % (
                     self._config['server_port'], remote_port,
-                    self._client_address[0], common.to_str(remote_addr)
+                    addr, common.to_str(remote_addr)
                 ))
 
             if self._is_local is False:
@@ -642,8 +641,9 @@ class TCPRelayHandler(object):
             logging.warn('unknown socket')
 
     def _log_error(self, e):
+        addr, port = self._local_sock.getsockname()[:2]
         logging.error('U[%d] %s when handling connection from %s:%d' %
-                      (self._config['server_port'], e, self._client_address[0], self._client_address[1]))
+                      (self._config['server_port'], e, addr, port))
 
     def destroy(self):
         # destroy the handler and release any resources
