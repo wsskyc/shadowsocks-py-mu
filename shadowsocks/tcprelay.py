@@ -600,13 +600,13 @@ class TCPRelayHandler(object):
     def _on_local_error(self):
         logging.debug('got local error')
         if self._local_sock:
-            logging.error(eventloop.get_sock_error(self._local_sock))
+            logging.error('U[%d] %s' % (self._config['server_port'], eventloop.get_sock_error(self._local_sock)))
         self.destroy()
 
     def _on_remote_error(self):
         logging.debug('got remote error')
         if self._remote_sock:
-            logging.error(eventloop.get_sock_error(self._remote_sock))
+            logging.error('U[%d] %s' % (self._config['server_port'], eventloop.get_sock_error(self._remote_sock)))
         self.destroy()
 
     def handle_event(self, sock, event):

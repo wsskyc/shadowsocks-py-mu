@@ -85,7 +85,7 @@ class DbTransfer(object):
             for port in dt_transfer.keys():
             	user = None
             	for result in users:
-            		if result[0] == port:
+            		if str(result[0]) == port:
             			user = result[9]
             			break
                 if not user:
