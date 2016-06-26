@@ -63,7 +63,7 @@ if os.path.isdir('../.git') and not os.path.isdir('../.nogit'):
     else:
         VERSION = subprocess.check_output(["git", "describe", "--tags"])
 else:
-    VERSION = '3.1.0'
+    VERSION = '3.1.1'
 
 
 def main():
