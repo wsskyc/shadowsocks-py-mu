@@ -66,6 +66,9 @@ else:
     VERSION = '3.1.1'
 
 
+def subprocess_callback(stack, exception):
+    logging.info('Exception thrown in %s: %s' % (stack, exception))
+
 def main():
     if config.SS_FIREWALL_ENABLED:
         if config.SS_FIREWALL_MODE == 'blacklist':
@@ -97,7 +100,7 @@ def main():
     else:
         logging.info('Now using MySQL Database as the user interface')
     logging.info('Now starting manager thread...')
-    thread.start_new_thread(manager.run, (configer,))
+    thread.start_new_thread(manager.run, (configer,subprocess_callback,))
     time.sleep(5)
     logging.info('Now starting user pulling thread...')
     thread.start_new_thread(DbTransfer.thread_db, ())

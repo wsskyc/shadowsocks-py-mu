@@ -212,8 +212,13 @@ class Manager(object):
         self._loop.run()
 
 
-def run(config):
-    Manager(config).run()
+def run(config, callback):
+    try:
+        Manager(config).run()
+    except Exception as e:
+        callback('Manager', e)
+        logging.error('Unhandled exception is thrown in manager thread, exiting...')
+        exit('manager thread crashed')
 
 
 def test():
