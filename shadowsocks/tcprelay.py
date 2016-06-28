@@ -642,9 +642,12 @@ class TCPRelayHandler(object):
             logging.warn('unknown socket')
 
     def _log_error(self, e):
-        addr, port = self._local_sock.getsockname()[:2]
-        logging.error('U[%d] %s when handling connection from %s:%d' %
-                      (self._config['server_port'], e, addr, port))
+        if self._local_sock:
+            addr, port = self._local_sock.getsockname()[:2]
+            logging.error('U[%d] %s when handling connection from %s:%d' %
+                          (self._config['server_port'], e, addr, port))
+        else:
+            logging.error('U[%d] Unknown TCP error occurred' % self._config['server_port'])
 
     def destroy(self):
         # destroy the handler and release any resources
