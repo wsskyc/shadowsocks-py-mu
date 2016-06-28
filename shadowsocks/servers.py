@@ -55,7 +55,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../'))
 import manager
 from dbtransfer import DbTransfer
 
-if os.path.isdir('../.git') and not os.path.isdir('../.nogit'):
+if os.path.isdir('../.git') and not os.path.exists('../.nogit'):
     import subprocess
     if "check_output" not in dir(subprocess):
         # Compatible with Python < 2.7
@@ -96,10 +96,13 @@ def main():
         logging.info('Now using MultiUser API as the user interface')
     else:
         logging.info('Now using MySQL Database as the user interface')
+    logging.info('Now starting manager thread...')
     thread.start_new_thread(manager.run, (configer,))
-    time.sleep(1)
+    time.sleep(5)
+    logging.info('Now starting user pulling thread...')
     thread.start_new_thread(DbTransfer.thread_db, ())
-    time.sleep(1)
+    time.sleep(5)
+    logging.info('Now starting user pushing thread...')
     thread.start_new_thread(DbTransfer.thread_push, ())
     
     while True:

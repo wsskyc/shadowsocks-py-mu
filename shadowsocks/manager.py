@@ -63,9 +63,8 @@ class Manager(object):
                                                  socket.SOCK_DGRAM)
             self._control_socket.bind(addr)
             self._control_socket.setblocking(False)
-        except (OSError, IOError) as e:
-            logging.error(e)
-            logging.error('can not bind to manager address')
+        except Exception as e:
+            logging.error('Can not bind to manager address: %s' % e)
             exit(1)
         self._loop.add(self._control_socket,
                        eventloop.POLL_IN, self)

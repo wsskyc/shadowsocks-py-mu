@@ -343,6 +343,8 @@ class TCPRelayHandler(object):
             if self._is_local is False:
                 # spec https://shadowsocks.org/en/spec/one-time-auth.html
                 if self._ota_enable or (addrtype & ADDRTYPE_AUTH == ADDRTYPE_AUTH):
+                    if not self._ota_enable and self._config['verbose']:
+                        logging.info('U[%d] TCP one time auth automatically enabled' % self._config['server_port'])
                     self._ota_enable = True
                     if len(data) < header_length + ONETIMEAUTH_BYTES:
                         logging.warn('U[%d] One time auth header is too short' % self._config['server_port'])
