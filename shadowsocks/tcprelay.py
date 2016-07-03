@@ -286,7 +286,7 @@ class TCPRelayHandler(object):
 
     def _handle_stage_addr(self, data):
         try:
-            addr, port = self._local_sock.getsockname()[:2]
+            addr, port = self._local_sock.getpeername()[:2]
             if self._is_local:
                 cmd = common.ord(data[1])
                 if cmd == CMD_UDP_ASSOCIATE:
@@ -645,7 +645,7 @@ class TCPRelayHandler(object):
 
     def _log_error(self, e):
         if self._local_sock:
-            addr, port = self._local_sock.getsockname()[:2]
+            addr, port = self._local_sock.getpeername()[:2]
             logging.error('U[%d] %s when handling connection from %s:%d' %
                           (self._config['server_port'], e, addr, port))
         else:
