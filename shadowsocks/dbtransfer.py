@@ -45,7 +45,7 @@ class DbTransfer(object):
         data = ''
         try:
             cli = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            cli.settimeout(1)
+            cli.settimeout(2)
             cli.sendto(cmd, ('%s' % config.MANAGE_BIND_IP, config.MANAGE_PORT))
             data, addr = cli.recvfrom(1500)
             cli.close()
@@ -55,7 +55,7 @@ class DbTransfer(object):
             if config.SS_VERBOSE:
                 import traceback
                 traceback.print_exc()
-            logging.warn('send_command exception: %s' % e)
+            logging.warn('Exception thrown when sending command: %s' % e)
         return data
 
     @staticmethod
@@ -231,7 +231,7 @@ class DbTransfer(object):
                 if config.SS_VERBOSE:
                     import traceback
                     traceback.print_exc()
-                logging.error('db thread except:%s' % e)
+                logging.error('Except thrown while pulling user data:%s' % e)
             finally:
                 time.sleep(config.CHECKTIME)
 
@@ -245,7 +245,7 @@ class DbTransfer(object):
                 import traceback
                 if config.SS_VERBOSE:
                     traceback.print_exc()
-                logging.error('db thread except:%s' % e)
+                logging.error('Except thrown while pushing user data:%s' % e)
             finally:
                 time.sleep(config.SYNCTIME)
 
