@@ -27,4 +27,4 @@ CREATE TABLE IF NOT EXISTS `user` (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` (`email`, `pass`, `password`, `transfer_enable`, `port`) VALUES ('test@test.com', '123456', '0000000', '9320666234', '50000');
+INSERT INTO `user` (`email`, `pass`, `passwd`, `transfer_enable`, `port`) VALUES ('test@test.com', '123456', '0000000', '9320666234', '50000');
