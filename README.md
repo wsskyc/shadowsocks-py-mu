@@ -17,6 +17,13 @@ Install instruction for MU API user
 2. copy `config_example.py` to `config.py` and edit it following the notes inside (but DO NOT delete the example file). You do not need to edit the MySQL Database section.
 3. TestRun `cd shadowsocks && python servers.py` (not server.py)
 
+Install Instructions for Docker User
+--------------------------
+
+1. `docker build -t shadowsocks-mu .`
+2. create a config file as above
+3. `docker run -v /PATH/TO/CONFIG/FILE:/shadowsocks/shadowsocks/config.py -p PORT_START-PORT_END shadowsocks`
+
 Reminders for Windows User
 --------------------------
 1. install pyuv by `pip install pyuv`
