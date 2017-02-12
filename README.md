@@ -20,9 +20,13 @@ Install instruction for MU API user
 Install Instructions for Docker User
 --------------------------
 
-1. `docker build -t shadowsocks-mu .`
+1. build the docker: `docker build -t shadowsocks-mu .`
 2. create a config file as above
-3. `docker run -v /PATH/TO/CONFIG/FILE:/shadowsocks/shadowsocks/config.py -p PORT_START-PORT_END shadowsocks`
+3. run the docker (random free ports will be allocated): `docker run -v /PATH/TO/CONFIG/FILE:/shadowsocks/shadowsocks/config.py -p PORT_START-PORT_END shadowsocks-mu`
+   
+   [OR] to use fixed ports: `docker run -v /PATH/TO/CONFIG/FILE:/shadowsocks/shadowsocks/config.py -p PORT_START-PORT_END:PORT_START-PORT_END shadowsocks-mu`
+   
+   *Reminder: `/PATH/TO/CONFIG/FILE` should be an absolute path*
 
 Reminders for Windows User
 --------------------------
@@ -68,9 +72,9 @@ Database user table column
 
 `t` last connecting time
 
-`u` upload transfer
+`u` no usage for this version of shadowsocks (kept at 0) but essential for some panels
 
-`d` download transfer
+`d` upload + download transfer
 
 `method` encryption method
 
