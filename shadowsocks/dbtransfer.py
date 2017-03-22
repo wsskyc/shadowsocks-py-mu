@@ -83,11 +83,11 @@ class DbTransfer(object):
                 logging.info('api upload: pushing transfer statistics')
             users = DbTransfer.pull_api_user()
             for port in dt_transfer.keys():
-            	user = None
-            	for result in users:
-            		if str(result[0]) == port:
-            			user = result[9]
-            			break
+                user = None
+                for result in users:
+                    if str(result[0]) == port:
+                        user = result[9]
+                        break
                 if not user:
                     logging.warn('U[%s] User Not Found', port)
                     server = json.loads(DbTransfer.get_instance().send_command(
@@ -211,7 +211,7 @@ class DbTransfer(object):
                         DbTransfer.send_command(
                             'remove: {"server_port":%d}' % row[0])
             else:
-                if row[5] == 1 and row[6] == 1 and row[1] + row[2] < row[3]:
+                if (row[5] == 1 or row[5] == "1") and row[6] == 1 and row[1] + row[2] < row[3]:
                     if not config.CUSTOM_METHOD:
                         row[7] = config.SS_METHOD
                     DbTransfer.send_command(
