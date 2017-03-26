@@ -29,6 +29,20 @@ htmlcov
 
 .DS_Store
 .idea
+tags
 shadowsocks/config.py
 *.log
 *.pyc
+
+#Emacs
+.#*
+venv/
+
+# VS-code
+.vscode/
+
+# Pycharm
+.idea
+
+#ss
+config.json

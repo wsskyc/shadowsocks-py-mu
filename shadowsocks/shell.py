@@ -25,7 +25,7 @@ import getopt
 import logging
 import config
 from shadowsocks.common import to_bytes, to_str, IPNetwork
-from shadowsocks import encrypt
+from shadowsocks import cryptor
 
 
 VERBOSE_LEVEL = 5
@@ -126,7 +126,7 @@ def check_config(config, is_local):
             logging.error('user can be used only on Unix')
             sys.exit(1)
 
-    encrypt.try_cipher(config['password'], config['method'])
+    cryptor.try_cipher(config['password'], config['method'])
 
 
 def get_config(is_local):
@@ -293,6 +293,18 @@ Proxy options:
   -l LOCAL_PORT          local port, default: 1080
   -k PASSWORD            password
   -m METHOD              encryption method, default: aes-256-cfb
+                         supported method:
+                             chacha20-poly1305, chacha20-ietf-poly1305,
+                             *xchacha20-ietf-poly1305,
+                             aes-128-gcm, aes-192-gcm, aes-256-gcm,
+                             aes-128-cfb, aes-192-cfb, aes-256-cfb,
+                             es-128-ctr, aes-192-ctr, aes-256-ctr,
+                             camellia-128-cfb, camellia-192-cfb,
+                             camellia-256-cfb,
+                             salsa20, chacha20, chacha20-ietf,
+                             bf-cfb, cast5-cfb, des-cfb, idea-cfb,
+                             rc2-cfb, seed-cfb,
+                             rc4, rc4-md5, table.
   -t TIMEOUT             timeout in seconds, default: 300
   --fast-open            use TCP_FASTOPEN, requires Linux 3.7+
 
@@ -322,6 +334,18 @@ Proxy options:
   -p SERVER_PORT         server port, default: 8388
   -k PASSWORD            password
   -m METHOD              encryption method, default: aes-256-cfb
+                         supported method:
+                             chacha20-poly1305, chacha20-ietf-poly1305,
+                             *xchacha20-ietf-poly1305,
+                             aes-128-gcm, aes-192-gcm, aes-256-gcm,
+                             aes-128-cfb, aes-192-cfb, aes-256-cfb,
+                             es-128-ctr, aes-192-ctr, aes-256-ctr,
+                             camellia-128-cfb, camellia-192-cfb,
+                             camellia-256-cfb,
+                             salsa20, chacha20, chacha20-ietf,
+                             bf-cfb, cast5-cfb, des-cfb, idea-cfb,
+                             rc2-cfb, seed-cfb,
+                             rc4, rc4-md5, table.
   -t TIMEOUT             timeout in seconds, default: 300
   -a ONE_TIME_AUTH       one time auth
   --fast-open            use TCP_FASTOPEN, requires Linux 3.7+
