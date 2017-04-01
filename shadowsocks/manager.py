@@ -208,6 +208,18 @@ class Manager(object):
                     if self._config['verbose']:
                         traceback.print_exc()
 
+        try:
+            self._control_socket.sendto(data, self._control_client_addr)
+        except (socket.error, OSError, IOError) as e:
+            error_no = eventloop.errno_from_exception(e)
+            if error_no in (errno.EAGAIN, errno.EINPROGRESS,
+                            errno.EWOULDBLOCK):
+                return
+            else:
+                shell.print_exception(e)
+                if self._config['verbose']:
+                    traceback.print_exc()
+
     def run(self):
         self._loop.run()
 
@@ -225,7 +237,7 @@ def test():
     import time
     import threading
     import struct
-    from shadowsocks import encrypt
+    from shadowsocks import cryptor
 
     logging.basicConfig(level=5,
                         format='%(asctime)s %(levelname)-8s %(message)s',
@@ -275,7 +287,7 @@ def test():
 
     # test statistics for TCP
     header = common.pack_addr(b'google.com') + struct.pack('>H', 80)
-    data = encrypt.encrypt_all(b'asdfadsfasdf', 'aes-256-cfb', 1,
+    data = cryptor.encrypt_all(b'asdfadsfasdf', 'aes-256-cfb',
                                header + b'GET /\r\n\r\n')
     tcp_cli = socket.socket()
     tcp_cli.connect(('127.0.0.1', 7001))
@@ -293,7 +305,7 @@ def test():
 
     # test statistics for UDP
     header = common.pack_addr(b'127.0.0.1') + struct.pack('>H', 80)
-    data = encrypt.encrypt_all(b'foobar2', 'aes-256-cfb', 1,
+    data = cryptor.encrypt_all(b'foobar2', 'aes-256-cfb',
                                header + b'test')
     udp_cli = socket.socket(type=socket.SOCK_DGRAM)
     udp_cli.sendto(data, ('127.0.0.1', 8382))

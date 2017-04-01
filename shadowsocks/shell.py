@@ -24,8 +24,12 @@ import sys
 import getopt
 import logging
 import config
+import traceback
+
+from functools import wraps
+
 from shadowsocks.common import to_bytes, to_str, IPNetwork
-from shadowsocks import encrypt
+from shadowsocks import cryptor
 
 
 VERBOSE_LEVEL = 5
@@ -55,6 +59,49 @@ def print_exception(e):
     if verbose > 0:
         import traceback
         traceback.print_exc()
+
+
+def exception_handle(self_, err_msg=None, exit_code=None,
+                     destroy=False, conn_err=False):
+    # self_: if function passes self as first arg
+
+    def process_exception(e, self=None):
+        print_exception(e)
+        if err_msg:
+            logging.error(err_msg)
+        if exit_code:
+            sys.exit(1)
+
+        if not self_:
+            return
+
+        if conn_err:
+            addr, port = self._client_address[0], self._client_address[1]
+            logging.error('%s when handling connection from %s:%d' %
+                          (e, addr, port))
+        if self._config['verbose']:
+            traceback.print_exc()
+        if destroy:
+            self.destroy()
+
+    def decorator(func):
+        if self_:
+            @wraps(func)
+            def wrapper(self, *args, **kwargs):
+                try:
+                    func(self, *args, **kwargs)
+                except Exception as e:
+                    process_exception(e, self)
+        else:
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                try:
+                    func(*args, **kwargs)
+                except Exception as e:
+                    process_exception(e)
+
+        return wrapper
+    return decorator
 
 
 def print_shadowsocks():
@@ -126,7 +173,7 @@ def check_config(config, is_local):
             logging.error('user can be used only on Unix')
             sys.exit(1)
 
-    encrypt.try_cipher(config['password'], config['method'])
+    cryptor.try_cipher(config['password'], config['method'])
 
 
 def get_config(is_local):
@@ -293,6 +340,21 @@ Proxy options:
   -l LOCAL_PORT          local port, default: 1080
   -k PASSWORD            password
   -m METHOD              encryption method, default: aes-256-cfb
+                         Sodium:
+                            chacha20-poly1305, chacha20-ietf-poly1305,
+                            *xchacha20-ietf-poly1305,
+                            sodium:aes-256-gcm,
+                            salsa20, chacha20, chacha20-ietf.
+                         OpenSSL:(* v1.1)
+                            *aes-128-ocb, *aes-192-ocb, *aes-256-ocb,
+                            aes-128-gcm, aes-192-gcm, aes-256-gcm,
+                            aes-128-cfb, aes-192-cfb, aes-256-cfb,
+                            aes-128-ctr, aes-192-ctr, aes-256-ctr,
+                            camellia-128-cfb, camellia-192-cfb,
+                            camellia-256-cfb,
+                            bf-cfb, cast5-cfb, des-cfb, idea-cfb,
+                            rc2-cfb, seed-cfb,
+                            rc4, rc4-md5, table.
   -t TIMEOUT             timeout in seconds, default: 300
   --fast-open            use TCP_FASTOPEN, requires Linux 3.7+
 
@@ -322,6 +384,21 @@ Proxy options:
   -p SERVER_PORT         server port, default: 8388
   -k PASSWORD            password
   -m METHOD              encryption method, default: aes-256-cfb
+                         Sodium:
+                            chacha20-poly1305, chacha20-ietf-poly1305,
+                            *xchacha20-ietf-poly1305,
+                            sodium:aes-256-gcm,
+                            salsa20, chacha20, chacha20-ietf.
+                         OpenSSL:(* v1.1)
+                            *aes-128-ocb, *aes-192-ocb, *aes-256-ocb,
+                            aes-128-gcm, aes-192-gcm, aes-256-gcm,
+                            aes-128-cfb, aes-192-cfb, aes-256-cfb,
+                            aes-128-ctr, aes-192-ctr, aes-256-ctr,
+                            camellia-128-cfb, camellia-192-cfb,
+                            camellia-256-cfb,
+                            bf-cfb, cast5-cfb, des-cfb, idea-cfb,
+                            rc2-cfb, seed-cfb,
+                            rc4, rc4-md5, table.
   -t TIMEOUT             timeout in seconds, default: 300
   -a ONE_TIME_AUTH       one time auth
   --fast-open            use TCP_FASTOPEN, requires Linux 3.7+
