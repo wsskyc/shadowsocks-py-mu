@@ -208,6 +208,18 @@ class Manager(object):
                     if self._config['verbose']:
                         traceback.print_exc()
 
+        try:
+            self._control_socket.sendto(data, self._control_client_addr)
+        except (socket.error, OSError, IOError) as e:
+            error_no = eventloop.errno_from_exception(e)
+            if error_no in (errno.EAGAIN, errno.EINPROGRESS,
+                            errno.EWOULDBLOCK):
+                return
+            else:
+                shell.print_exception(e)
+                if self._config['verbose']:
+                    traceback.print_exc()
+
     def run(self):
         self._loop.run()
 

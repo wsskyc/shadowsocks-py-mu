@@ -53,6 +53,7 @@ except ImportError:
     sys.exit('example config file missing')
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../'))
 import manager
+import traceback
 from dbtransfer import DbTransfer
 
 if os.path.isdir('../.git') and not os.path.exists('../.nogit'):
@@ -63,11 +64,14 @@ if os.path.isdir('../.git') and not os.path.exists('../.nogit'):
     else:
         VERSION = subprocess.check_output(["git", "describe", "--tags"])
 else:
-    VERSION = '3.1.1'
+    VERSION = '3.2.0'
 
 
 def subprocess_callback(stack, exception):
     logging.info('Exception thrown in %s: %s' % (stack, exception))
+    if config.SS_VERBOSE:
+        traceback.print_exc()
+
 
 def main():
     if config.SS_FIREWALL_ENABLED:
@@ -100,7 +104,7 @@ def main():
     else:
         logging.info('Now using MySQL Database as the user interface')
     logging.info('Now starting manager thread...')
-    thread.start_new_thread(manager.run, (configer,subprocess_callback,))
+    thread.start_new_thread(manager.run, (configer, subprocess_callback,))
     time.sleep(5)
     logging.info('Now starting user pulling thread...')
     thread.start_new_thread(DbTransfer.thread_db, ())
