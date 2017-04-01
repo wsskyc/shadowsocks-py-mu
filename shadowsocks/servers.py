@@ -64,7 +64,7 @@ if os.path.isdir('../.git') and not os.path.exists('../.nogit'):
     else:
         VERSION = subprocess.check_output(["git", "describe", "--tags"])
 else:
-    VERSION = '3.2.0'
+    VERSION = '3.3.0'
 
 
 def subprocess_callback(stack, exception):
